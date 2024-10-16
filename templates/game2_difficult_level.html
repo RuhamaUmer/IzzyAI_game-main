@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Include Bootstrap CSS and JS in your HTML -->
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <title>Voice Game</title>
+    <style>
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh; /* Changed from height to min-height */
+        margin: 0;
+        font-family: Arial, sans-serif; /* Consistent font family */
+        background-color: #f0f0f0; /* Changed to match the other pages */
+      }
+
+      .container {
+        width: 90%;
+        max-width: 400px;
+        margin: 0 auto;
+        text-align: center;
+        padding: 20px;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .heading {
+        display: flex;
+        align-items: center; /* Center align items vertically */
+        margin-bottom: 20px;
+      }
+
+      .heading-left {
+        margin-right: 10px; /* Add some space between the logo and text */
+      }
+
+      .heading-left img {
+        width: 40px;
+        height: 55px;
+      }
+
+      .heading-left span {
+        font-size: 1 rem;
+        font-weight: bold;
+        margin-left: 10px;
+        color: #333;
+      }
+
+      .heading h1 {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin: 0;
+        color: #333;
+        flex-grow: 1;
+        text-align: center;
+        margin-right: 17 0px;
+      }
+      .heading h3 {
+        font-size: medium;
+      }
+      .grid-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 10px;
+        margin-top: 20px;
+      }
+
+      .grid-item {
+        background-color: #83a1da;
+        border: 1px solid #999999;
+        padding: 10px;
+        text-align: center;
+        font-size: 16px;
+        border-radius: 5px;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .grid-item:hover {
+        background-color: #ffffff;
+        border-color: #83a1da;
+      }
+
+      #score {
+        font-weight: 600;
+        font-size: 18px;
+        color: black;
+        margin-top: 20px;
+      }
+
+      .grid-img {
+        height: 55px;
+        margin-bottom: 10px;
+        width: 90px;
+      }
+
+      .grid-link {
+        color: white;
+        font-weight: 500;
+        text-decoration: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .grid-link:hover {
+        color: #83a1da;
+      }
+
+      button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      .exit-button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 16px;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        background-color: #f44336;
+      }
+
+      @media (max-width: 400px) {
+        .grid-item {
+          padding: 5px;
+          font-size: 14px;
+        }
+
+        .grid-img {
+          height: 60px;
+          margin-bottom: 5px;
+        }
+
+        button,
+        .exit-button {
+          padding: 8px 16px;
+          font-size: 14px;
+        }
+      }
+
+      h3 {
+        font-size: 1.25rem;
+      }
+
+      @media (max-width: 576px) {
+        h3 {
+          font-size: 1rem;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div
+      class="modal fade"
+      id="customAlert"
+      tabindex="-1"
+      aria-labelledby="modalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalLabel">Alert</h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body" id="modalBody">
+            Start from the first Game.
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="heading">
+        <h1>Difficult Level</h1>
+      </div>
+      <div class="heading">
+        <div class="heading-left">
+          <img src="/static/images/logo 3.jpg" alt="Logo" />
+        </div>
+        <h3>Click on the First Card to start your game.</h3>
+      </div>
+      <div class="grid-container" id="gridContainer">
+        <!-- Grid items will be dynamically generated here -->
+      </div>
+      <div id="score"></div>
+      <!-- <button class="exit-button" onclick="clearandexit()">Exit</button> -->
+      <button onclick="submitScores()">Exit</button>
+    </div>
+
+    <script>
+      function showAlert(message) {
+        document.getElementById("modalBody").innerText = message;
+        $("#customAlert").modal("show");
+      }
+
+      function clearandexit() {
+        localStorage.clear();
+        location.href = "exit_game2_levels";
+      }
+
+      let sessionData = {};
+
+      async function fetchSessionData() {
+        try {
+          const response = await fetch("/get_session_data");
+          if (!response.ok) {
+            throw new Error("Failed to fetch session data");
+          }
+          sessionData = await response.json();
+          console.log("Session Data:", sessionData);
+        } catch (error) {
+          console.error("Error:", error);
+        }
+      }
+
+      const scores = [
+        {
+          id: 1,
+          name: "Sentence 1",
+          link: "game2_sentence1",
+          storageKey: "sentence1_score",
+        },
+        {
+          id: 2,
+          name: "Sentence 2",
+          link: "game2_sentence2",
+          storageKey: "sentence2_score",
+        },
+        {
+          id: 3,
+          name: "Sentence 3",
+          link: "game2_sentence3",
+          storageKey: "sentence3_score",
+        },
+        {
+          id: 4,
+          name: "Sentence 4",
+          link: "game2_sentence4",
+          storageKey: "sentence4_score",
+        },
+        {
+          id: 5,
+          name: "Sentence 5",
+          link: "game2_sentence5",
+          storageKey: "sentence5_score",
+        },
+        {
+          id: 6,
+          name: "Sentence 6",
+          link: "game2_sentence6",
+          storageKey: "sentence6_score",
+        },
+        {
+          id: 7,
+          name: "Sentence 7",
+          link: "game2_sentence7",
+          storageKey: "sentence7_score",
+        },
+        {
+          id: 8,
+          name: "Sentence 8",
+          link: "game2_sentence8",
+          storageKey: "sentence8_score",
+        },
+        {
+          id: 9,
+          name: "Sentence 9",
+          link: "game2_sentence9",
+          storageKey: "sentence9_score",
+        },
+        {
+          id: 10,
+          name: "Sentence 10",
+          link: "game2_sentence10",
+          storageKey: "sentence10_score",
+        },
+        {
+          id: 11,
+          name: "Sentence 11",
+          link: "game2_sentence11",
+          storageKey: "sentence11_score",
+        },
+        {
+          id: 12,
+          name: "Sentence 12",
+          link: "game2_sentence12",
+          storageKey: "sentence12_score",
+        },
+      ];
+
+      function generateGridItems(scores) {
+        const gridContainer = document.getElementById("gridContainer");
+        scores.forEach(function (score) {
+          const gridItem = document.createElement("div");
+          gridItem.classList.add("grid-item");
+
+          const gridLink = document.createElement("a");
+          gridLink.addEventListener("click", function (event) {
+            if (score.id > 1) {
+              event.preventDefault();
+              showAlert("Start from the first Game");
+            } else {
+              gridLink.href = score.link;
+            }
+          });
+
+          if (score.id === 1) {
+            gridLink.href = score.link;
+          }
+
+          gridLink.classList.add("grid-link");
+
+          const gridImg = document.createElement("img");
+          gridImg.alt = score.name;
+          gridImg.classList.add("grid-img");
+          gridLink.append(document.createTextNode(score.name));
+
+          const gridText = document.createElement("div");
+          const storedScore = localStorage.getItem(score.storageKey);
+          if (storedScore) {
+            gridText.innerHTML = `<br/> Score: ${storedScore}`;
+            gridLink.appendChild(gridText);
+          }
+
+          gridItem.appendChild(gridLink);
+          gridContainer.appendChild(gridItem);
+        });
+      }
+
+      function calculateTotalScore(scores) {
+        const scorePerCard = 100 / scores.length; // Each card has a baseline score of 100 / 16
+        let totalScore = 0;
+
+        scores.forEach(function (score) {
+          const storedScore = localStorage.getItem(score.storageKey);
+          const parsedScore = parseInt(storedScore, 10) || 0; // Fallback to 0 if not a valid number
+
+          // Calculate contribution of this card towards total score
+          totalScore += (parsedScore / 100) * scorePerCard;
+        });
+
+        return totalScore;
+      }
+      function renderTotalScore() {
+        const totalScore = calculateTotalScore(scores);
+        document.getElementById("score").textContent =
+          "Total Score: " + totalScore.toFixed(2);
+      }
+
+      async function submitScores() {
+        const totalScore = calculateTotalScore(scores);
+        try {
+          if (!sessionData.UserID || !sessionData.DisorderID) {
+            throw new Error("Session data is incomplete, cannot submit score");
+          }
+
+          const response = await fetch("/submit_score", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              UserID: sessionData.UserID,
+              DisorderID: sessionData.DisorderID,
+              Score: totalScore,
+              GameName: "Sounds Game",
+              LevelName: "Difficult Level",
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error("Failed to submit score");
+          }
+
+          const data = await response.json();
+          document.getElementById("score").textContent =
+            "Total Score: " + totalScore.toFixed(2);
+          console.log("Score submitted successfully:", data);
+        } catch (error) {
+          console.error("Error:", error);
+        }
+        clearandexit();
+      }
+
+      document.addEventListener("DOMContentLoaded", async function () {
+        await fetchSessionData();
+
+        generateGridItems(scores);
+        renderTotalScore();
+      });
+    </script>
+  </body>
+</html>

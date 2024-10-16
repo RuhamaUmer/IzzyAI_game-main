@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <title>Food Organizing Game</title>
+    <style>
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh; /* Changed from height to min-height */
+        margin: 0;
+        font-family: Arial, sans-serif; /* Consistent font family */
+        background-color: #f0f0f0; /* Changed to match the other pages */
+      }
+      .container {
+        width: 100%;
+        max-width: 400px;
+        margin: 0 auto;
+        text-align: center;
+        padding: 20px;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .heading {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      .heading-left {
+        display: flex;
+        align-items: center; /* Align items vertically */
+      }
+      .heading-left img {
+        width: 40px; /* Adjust size if necessary */
+        height: 55px; /* Adjust size if necessary */
+        margin-right: 10px; /* Space between logo and heading */
+      }
+      .heading-left h2 {
+        font-size: 1.5rem; /* Adjust font size as necessary */
+        font-weight: bold;
+        color: #333;
+      }
+      .heading h1 {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin: 0;
+        color: #333;
+        flex-grow: 1;
+        text-align: center;
+        margin-right: 17 0px;
+      }
+      .heading h3 {
+        font-size: medium;
+      }
+      .category-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* Center categories and images */
+      }
+
+      .grid-container {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 10px;
+        margin-top: 20px;
+      }
+
+      .grid-item {
+        background-color: #83a1da;
+        border: 1px solid #999999;
+        padding: 10px;
+        text-align: center;
+        font-size: 16px;
+        border-radius: 5px;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .grid-item:hover {
+        background-color: #ffffff;
+        border-color: #83a1da;
+      }
+
+      #score {
+        font-weight: 600;
+        font-size: 18px;
+        color: black;
+        margin-top: 20px;
+      }
+
+      .grid-img {
+        height: 60px;
+        margin-bottom: 5px;
+      }
+
+      .win {
+        color: green;
+      }
+
+      button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      .exit-button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 16px;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        background-color: #f44336;
+      }
+
+      .timer {
+        font-size: 24px;
+        color: #f44336;
+        margin-top: 10px;
+      }
+
+      .message {
+        font-size: 18px;
+        font-weight: bold;
+      }
+
+      .win {
+        color: green;
+      }
+
+      .lose {
+        color: red;
+      }
+
+      @media (max-width: 576px) {
+        .grid-container {
+          grid-template-columns: repeat(3, 1fr);
+        }
+
+        .grid-item {
+          font-size: 12px;
+          padding: 13px;
+        }
+        .grid-img {
+          height: 50px; /* Reduced height */
+          width: auto; /* Maintain aspect ratio */
+          margin-bottom: 5px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="heading">
+        <div class="heading">
+          <h1>Level 1</h1>
+        </div>
+
+        <div class="heading">
+          <div class="heading-left">
+            <img src="/static/images/logo 3.jpg" class="mb-3" alt="Logo" />
+            <p>Arrange the food cards in their respective categories to win.</p>
+          </div>
+        </div>
+
+        <button
+          class="btn btn-primary"
+          id="startGameButton"
+          onclick="startGame()"
+        >
+          Start Game
+        </button>
+
+        <div class="timer" id="timer" style="visibility: hidden">
+          Time Remaining: 20s
+        </div>
+      </div>
+      <div class="grid-container" id="gridContainer">
+        <div
+          class="category-container"
+          id="fruits"
+          ondrop="drop(event)"
+          ondragover="allowDrop(event)"
+        >
+          <h3>Fruits</h3>
+        </div>
+
+        <div
+          class="category-container"
+          id="liquids"
+          ondrop="drop(event)"
+          ondragover="allowDrop(event)"
+        >
+          <h3>Drinks</h3>
+        </div>
+        <div
+          class="category-container"
+          id="edibleFoods"
+          ondrop="drop(event)"
+          ondragover="allowDrop(event)"
+        >
+          <h3>Meal Items</h3>
+        </div>
+      </div>
+      <div id="score" class="message"></div>
+      <!-- <button class="exit-button" onclick="clearAndExit()">Exit</button> -->
+      <button onclick="submitScores()">Exit</button>
+    </div>
+    <script>
+      let sessionData = {};
+      let isWinner = false; // Flag to check if the game has been won
+      let initialArrangement = []; // To store the initial arrangement of food items
+
+      // Fetch session data
+      function fetchSessionData() {
+        return fetch("/get_session_data")
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Failed to fetch session data");
+            }
+            return response.json();
+          })
+          .then((data) => {
+            sessionData = data;
+            console.log("Session Data:", sessionData);
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+      }
+      function clearAndExit() {
+        clearInterval(timerInterval);
+        localStorage.clear();
+        location.href = "exit_food_levels";
+      }
+
+      // Modify submitScores function to include the dynamic score
+      // Submit scores
+      function submitScores() {
+        const totalScore = calculateTotalScore();
+        if (!sessionData.UserID || !sessionData.DisorderID) {
+          console.error("Session data is incomplete, cannot submit score");
+          return;
+        }
+
+        fetch("/submit_score", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            UserID: sessionData.UserID,
+            DisorderID: sessionData.DisorderID,
+            Score: totalScore,
+            GameName: "Food Object Game",
+            LevelName: "Level 2",
+          }),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Failed to submit score");
+            }
+            return response.json();
+          })
+          .then((data) => {
+            console.log("Score submitted:", data);
+            document.getElementById("score").textContent =
+              "Total Score: " + totalScore.toFixed(2);
+          })
+          .catch((error) => console.error("Error:", error));
+        clearAndExit();
+      }
+      // Calculate total score based on correct placements and initial arrangement
+      function calculateTotalScore() {
+        const currentArrangement = foods.map((food) => {
+          const item = document.getElementById(`food-${food.id}`);
+          return item.parentNode.id; // Get the current category of each food item
+        });
+
+        // If the current arrangement matches the initial arrangement, return 0
+        const isSameArrangement = currentArrangement.every(
+          (category, index) => {
+            return category === initialArrangement[index];
+          }
+        );
+
+        if (isSameArrangement) {
+          return 0; // Score is 0 if no items have been moved
+        }
+
+        let correct = 0;
+        foods.forEach((food) => {
+          let item = document.getElementById(`food-${food.id}`);
+          if (item && item.parentNode.id === food.category) {
+            correct++;
+          }
+        });
+        // Total score is calculated as a percentage of correct answers out of total foods
+        return (correct / foods.length) * 100;
+      }
+
+      const foods = [
+        {
+          id: 1,
+          name: "Orange",
+          img: "/static/images/orange.gif",
+          category: "fruits",
+        },
+        {
+          id: 2,
+          name: "Apple",
+          img: "/static/images/apple.gif",
+          category: "fruits",
+        },
+        {
+          id: 3,
+          name: "Banana",
+          img: "/static/images/banana.gif",
+          category: "fruits",
+        },
+        {
+          id: 4,
+          name: "Milkshake",
+          img: "/static/images/milkshake.gif",
+          category: "liquids",
+        },
+        {
+          id: 5,
+          name: "Water",
+          img: "/static/images/water.gif",
+          category: "liquids",
+        },
+        {
+          id: 6,
+          name: "Juice",
+          img: "/static/images/juice.gif",
+          category: "liquids",
+        },
+        {
+          id: 7,
+          name: "Egg",
+          img: "/static/images/egg.gif",
+          category: "edibleFoods",
+        },
+        {
+          id: 8,
+          name: "Potato",
+          img: "/static/images/potato.gif",
+          category: "edibleFoods",
+        },
+        {
+          id: 9,
+          name: "Rice",
+          img: "/static/images/rice.gif",
+          category: "edibleFoods",
+        },
+      ];
+
+      let timerInterval;
+      function startGame() {
+        document.getElementById("startGameButton").disabled = true; // Disable the button at the start
+        resetGame(); // Reset the game to initial state
+        shuffle(foods);
+        initializeGame();
+        startTimer();
+      }
+
+      function resetGame() {
+        const scoreElement = document.getElementById("score");
+        const timerElement = document.getElementById("timer");
+
+        scoreElement.innerHTML = "";
+        scoreElement.className = "message"; // Reset class
+        timerElement.style.visibility = "hidden"; // Hide timer initially
+
+        // Clear the content of category containers
+        document.getElementById("fruits").innerHTML = `<h3>Fruits</h3>`;
+        document.getElementById("liquids").innerHTML = `<h3>Drinks</h3>`;
+        document.getElementById(
+          "edibleFoods"
+        ).innerHTML = `<h3>Meal Items</h3>`;
+
+        // Re-enable the start game button
+        document.getElementById("startGameButton").disabled = false;
+        isWinner = false; // Reset the winner flag
+      }
+      function shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+      }
+
+      function initializeGame() {
+        const containers = ["fruits", "liquids", "edibleFoods"];
+        document.getElementById("fruits").innerHTML = `<h3>Fruits</h3>`;
+        document.getElementById("liquids").innerHTML = `<h3>Drinks</h3>`;
+        document.getElementById(
+          "edibleFoods"
+        ).innerHTML = `<h3>Meal Items</h3>`;
+
+        shuffle(foods);
+        initialArrangement = []; // Reset the initial arrangement array
+
+        foods.forEach((food) => {
+          const category =
+            containers[Math.floor(Math.random() * containers.length)];
+          const container = document.getElementById(category);
+          const item = document.createElement("div");
+          item.className = "grid-item";
+          item.id = `food-${food.id}`;
+          item.draggable = true;
+          item.ondragstart = drag;
+          item.innerHTML = `<img src="${food.img}" alt="${food.name}" class="grid-img" draggable="true" ondragstart="drag(event)">`;
+
+          container.appendChild(item);
+          initialArrangement.push(category); // Store the initial category of each food item
+        });
+      }
+
+      function allowDrop(event) {
+        console.log("Allow drop triggered");
+        event.preventDefault(); // Ensure that the drop event is allowed
+      }
+
+      function drag(event) {
+        if (event.target && event.target.id) {
+          console.log("Drag started for:", event.target.id);
+          event.dataTransfer.setData("text", event.target.id); // Use the ID of the element
+        } else if (event.target.tagName === "IMG") {
+          console.log("Dragging an image element, setting ID manually");
+          const parent = event.target.closest(".grid-item");
+          if (parent && parent.id) {
+            event.dataTransfer.setData("text", parent.id); // Set parent element's ID
+            console.log("Drag started for parent:", parent.id);
+          } else {
+            console.log("Drag event failed for image - parent has no id");
+          }
+        } else {
+          console.log("Drag event failed");
+        }
+      }
+
+      function drop(event) {
+        event.preventDefault();
+        const data = event.dataTransfer.getData("text");
+        const draggedElement = document.getElementById(data);
+
+        console.log("Drop event triggered with data:", data);
+
+        // Check if a valid element was dragged
+        if (!draggedElement) {
+          console.error("Dragged element not found:", data);
+          return;
+        }
+
+        // Identify the target container
+        const targetContainer = event.target.closest(".category-container");
+
+        if (targetContainer) {
+          console.log("Dropping into container:", targetContainer.id);
+          targetContainer.appendChild(draggedElement); // Append the dragged element to the drop target
+          checkScore(); // Check the score after each drop
+        } else {
+          console.error("No valid drop target found");
+        }
+      }
+      function checkScore() {
+        const totalScore = calculateTotalScore();
+        const scoreElement = document.getElementById("score");
+        const timerElement = document.getElementById("timer");
+
+        if (totalScore === 100) {
+          scoreElement.innerHTML = "You win with score 100!";
+          scoreElement.className = "message win"; // Apply the win class for green color
+          isWinner = true; // Set the winner flag
+
+          clearInterval(timerInterval); // Stop the timer
+          timerElement.style.visibility = "hidden"; // Hide the timer
+        } else if (totalScore === 0 && !isWinner) {
+          scoreElement.innerHTML = "Score: 0! You haven't moved any items.";
+          scoreElement.className = "message lose";
+        } else {
+          scoreElement.innerHTML = `Score: ${totalScore.toFixed(2)}`;
+          scoreElement.className = "message";
+        }
+      }
+
+      // Modified timer function
+      function startTimer() {
+        let timeRemaining = 20;
+        document.getElementById("timer").style.visibility = "visible";
+        document.getElementById(
+          "timer"
+        ).textContent = `Time Remaining: ${timeRemaining}s`;
+
+        timerInterval = setInterval(() => {
+          if (timeRemaining <= 0) {
+            clearInterval(timerInterval);
+            document.getElementById("timer").textContent = "Time's up!";
+            if (!isWinner) {
+              checkScore(); // Automatically submit scores when time is up
+            }
+            document.getElementById("startGameButton").disabled = false; // Re-enable the start game button
+          } else {
+            document.getElementById(
+              "timer"
+            ).textContent = `Time Remaining: ${--timeRemaining}s`;
+          }
+        }, 1000);
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        fetchSessionData();
+      });
+    </script>
+  </body>
+</html>

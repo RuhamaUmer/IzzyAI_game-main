@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blow Game</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif; /* Same font family */
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        background-color: #f0f0f0;
+        padding: 20px;
+      }
+
+      #gameContainer {
+        position: relative;
+        width: 100%;
+        height: 600px;
+        border: 1px solid black;
+        margin: auto;
+      }
+
+      #box {
+        width: 100%;
+        height: 600px;
+        position: absolute;
+        bottom: 0;
+      }
+
+      #balloon {
+        position: absolute;
+        left: calc(6% + 12px);
+        bottom: 30%;
+        transform: translateX(-50%);
+        transition: left 0.1s ease-out;
+        width: 7%;
+        height: auto;
+      }
+
+      @media screen and (max-width: 600px) {
+        #balloon {
+          width: 14%;
+        }
+      }
+
+      @media screen and (max-width: 400px) {
+        #balloon {
+          width: 56px;
+        }
+      }
+
+      .header-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        margin-top: 20px;
+        margin-bottom: 20px;
+      }
+
+      .logo-izzy-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 10px;
+      }
+
+      #logo {
+        width: 35px;
+        height: 35px;
+        margin-right: 10px; /* Space between logo and IzzyAI text */
+      }
+
+      #izzyText {
+        font-size: 22px;
+        font-weight: bold;
+      }
+      h1 {
+        font-size: 32px;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 20px; /* Add margin between logo/IzzyAI and game title */
+      }
+
+      .point {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        background-color: red;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        font-weight: bold;
+      }
+
+      .point-a {
+        left: 5%;
+        bottom: 15%;
+      }
+
+      .point-b {
+        right: 5%;
+        bottom: 15%;
+      }
+
+      @media screen and (max-width: 600px) {
+        .point-a,
+        .point-b {
+          bottom: 15%;
+        }
+      }
+
+      @media screen and (max-width: 400px) {
+        .point-a,
+        .point-b {
+          bottom: 13%;
+        }
+      }
+
+      .controls {
+        justify-content: center;
+        display: flex;
+        align-self: center;
+        margin-top: 30px;
+      }
+
+      .controls button {
+        border-radius: 5px;
+        background-color: rgb(196, 48, 48);
+        padding: 8px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        color: white;
+        margin: 4px;
+      }
+
+      .timer-box {
+        font-size: 22px;
+        font-weight: 600;
+      }
+
+      #voiceMeterContainer {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-top: 10px;
+      }
+
+      #voiceMeter {
+        width: 200px;
+        height: 20px;
+        background-color: #ddd;
+        border: 1px solid #000;
+        position: relative;
+      }
+
+      #voiceLevel {
+        height: 100%;
+        width: 0%;
+        background-color: green;
+      }
+
+      /* Mobile adjustments */
+      @media screen and (max-width: 600px) {
+        .logo-izzy-container {
+          flex-direction: row; /* Keep logo and IzzyAI side by side in mobile view */
+          text-align: center;
+        }
+
+        #logo {
+          margin-bottom: 10px;
+        }
+
+        #izzyText {
+          font-size: 20px;
+        }
+
+        h1 {
+          font-size: 32px;
+        }
+      }
+    </style>
+  </head>
+  <body
+    data-balloon-easy="{{ balloon_easy }}"
+    data-balloon-medium="{{ balloon_medium }}"
+    data-balloon-hard="{{ balloon_hard }}"
+  >
+    <div class="header-container">
+      <!-- Container for Logo and IzzyAI side by side -->
+      <div class="logo-izzy-container">
+        <img
+          id="logo"
+          src="/static/images/logo 2.jpg"
+          alt="Logo"
+          width="30"
+          height="30"
+        />
+        <p id="izzyText">IzzyAI</p>
+      </div>
+      <!-- Game title below the logo and IzzyAI -->
+      <h1>Blow Game</h1>
+    </div>
+    <div id="gameContainer">
+      <div id="box">
+        <div class="point point-a">A</div>
+        <div class="point point-b">B</div>
+      </div>
+      <img id="balloon" src="{{ balloon_easy }}" alt="Balloon" />
+    </div>
+
+    <div class="progress-bar">
+      <div class="progress"></div>
+    </div>
+
+    <div
+      id="instruction"
+      style="text-align: center; color: red; margin-top: 20px"
+    ></div>
+
+    <div class="controls">
+      <button id="easyButton" onclick="selectDifficulty('easy')">Easy</button>
+      <button id="mediumButton" onclick="selectDifficulty('medium')">
+        Medium
+      </button>
+      <button id="hardButton" onclick="selectDifficulty('hard')">
+        Difficult
+      </button>
+      <button id="startButton" hidden onclick="startGame()">Start Game</button>
+      <button id="playAgainButton" hidden onclick="restartGame()">
+        Play Again
+      </button>
+      <button id="finishButton" hidden onclick="finishGame()">Finish</button>
+      <button id="previousButton" hidden onclick="finishGame()">
+        Previous
+      </button>
+    </div>
+
+    <div class="progress-bar">
+      <div class="progress"></div>
+    </div>
+
+    <div class="controls">
+      <div class="timer">
+        <div id="timer" class="timer-box"></div>
+        <div id="score" class="timer-box">Score: 0</div>
+      </div>
+    </div>
+
+    <div id="voiceMeterContainer">
+      <div id="voiceMeter">
+        <div id="voiceLevel"></div>
+      </div>
+    </div>
+
+    <script>
+      var audioContext;
+      var analyser;
+      var difficulty = "";
+      var timerInterval;
+      var updateInterval;
+      var silenceTimeout;
+      var silenceInterval;
+      var remainingTime = 40;
+      var timeLimit;
+      const minLoudnessThreshold = 15;
+      var gameActive = false;
+      var sessionData = {};
+      var score = 0;
+      var soundStopped = false;
+      var easy = false;
+      var medium = false;
+      var difficult = false;
+
+      function toggleDifficultyButtons(disableDuringGame) {
+        document.getElementById("easyButton").disabled = disableDuringGame;
+        document.getElementById("mediumButton").disabled = disableDuringGame;
+        document.getElementById("hardButton").disabled = disableDuringGame;
+
+        if (!disableDuringGame) {
+          document.getElementById("startButton").hidden = false;
+          document.getElementById("playAgainButton").hidden = true;
+          document.getElementById("finishButton").hidden = true;
+        }
+      }
+
+      function selectDifficulty(selectedDifficulty) {
+        difficulty = selectedDifficulty;
+        var pointA = document.querySelector(".point-a");
+        var pointB = document.querySelector(".point-b");
+        var instructionElement = document.getElementById("instruction"); // Element to display instructions
+
+        toggleDifficultyButtons(false);
+
+        instructionElement.style.display = "block"; // Show the instruction element
+
+        var balloon = document.getElementById("balloon");
+        var balloonEasy = document.body.dataset.balloonEasy;
+        var balloonMedium = document.body.dataset.balloonMedium;
+        var balloonHard = document.body.dataset.balloonHard;
+
+        if (difficulty === "medium") {
+          balloon.style.width = "50px";
+        } else {
+          balloon.style.width = "56px";
+        }
+
+        switch (difficulty) {
+          case "easy":
+            pointA.style.left = "30%";
+            pointB.style.right = "30%";
+            pointB.style.left = "auto";
+            balloon.src = balloonEasy;
+            instructionElement.textContent =
+              "Take a deep breath before pressing the start button. Make sure you are close enough to the microphone."; // Set instructions for hard difficulty
+            timeLimit = 5;
+            break;
+          case "medium":
+            pointA.style.left = "25%";
+            pointB.style.right = "25%";
+            pointB.style.left = "auto";
+            balloon.src = balloonMedium;
+            instructionElement.textContent =
+              "Take a deep breath before pressing the start button. Make sure you are close enough to the microphone."; // Set instructions for hard difficulty
+            timeLimit = 8;
+            break;
+          case "hard":
+            pointA.style.left = "18%";
+            pointB.style.right = "18%";
+            pointB.style.left = "auto";
+            balloon.src = balloonHard;
+            instructionElement.textContent =
+              "Take a deep breath before pressing the start button. Make sure you are close enough to the microphone."; // Set instructions for hard difficulty
+            timeLimit = 10;
+            break;
+        }
+
+        document.getElementById("timer").innerText =
+          "Time left: " + timeLimit + " seconds";
+        balloon.style.left = getComputedStyle(pointA).left;
+
+        // Show buttons for starting the game when a difficulty is selected
+        document.getElementById("startButton").hidden = false;
+        document.getElementById("finishButton").hidden = true;
+        document.getElementById("previousButton").hidden = false;
+        document.getElementById("playAgainButton").hidden = true;
+
+        // Hide difficulty buttons after selection
+        document.getElementById("easyButton").hidden = true;
+        document.getElementById("mediumButton").hidden = true;
+        document.getElementById("hardButton").hidden = true;
+      }
+
+      function fetchSessionData() {
+        fetch("/get_session_data")
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Failed to fetch session data");
+            }
+            return response.json();
+          })
+          .then((data) => {
+            sessionData = data;
+            console.log("Session Data:", sessionData);
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+      }
+
+      window.onload = fetchSessionData;
+
+      function initializeAudio() {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 256;
+        return navigator.mediaDevices
+          .getUserMedia({ audio: true })
+          .then(function (stream) {
+            var microphone = audioContext.createMediaStreamSource(stream);
+            microphone.connect(analyser);
+          })
+          .catch(function (err) {
+            console.error("Error accessing microphone:", err);
+          });
+      }
+
+      function startGame() {
+        if (gameActive) return;
+        gameActive = true;
+        resetGameState();
+
+        var startButton = document.getElementById("startButton");
+        var playAgainButton = document.getElementById("playAgainButton");
+
+        // Disable difficulty buttons only during the game
+        toggleDifficultyButtons(true);
+        document.getElementById("finishButton").hidden = false;
+        document.getElementById("previousButton").hidden = true;
+        startButton.hidden = true;
+
+        initializeAudio()
+          .then(function () {
+            resetGameVisuals();
+            var timerElement = document.getElementById("timer");
+            timerElement.style.color = "black";
+
+            timerInterval = setInterval(function () {
+              remainingTime--;
+              timerElement.textContent =
+                "Time left: " + remainingTime + " seconds";
+              if (remainingTime <= 0) {
+                endGame(false);
+              }
+            }, 1000);
+
+            updateInterval = setInterval(updateBalloonPosition, 100);
+          })
+          .catch(function (error) {
+            console.error(
+              "Failed to initialize audio or start game properly:",
+              error
+            );
+            gameActive = false;
+          });
+      }
+
+      function updateBalloonPosition() {
+        var balloonElement = document.getElementById("balloon");
+        var boxElement = document.getElementById("box");
+        var pointA = document.querySelector(".point-a");
+        var pointB = document.querySelector(".point-b");
+        var minX =
+          boxElement.offsetLeft +
+          (parseFloat(pointA.style.left) / 100) * boxElement.offsetWidth;
+        var maxX =
+          boxElement.offsetLeft +
+          boxElement.offsetWidth -
+          (parseFloat(pointB.style.right) / 100) * boxElement.offsetWidth;
+
+        var dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+        analyser.getByteFrequencyData(dataArray);
+
+        var loudness =
+          dataArray.reduce((acc, val) => acc + val) / dataArray.length;
+
+        var voiceLevel = document.getElementById("voiceLevel");
+
+        var maxLoudnessValue = 255; // Maximum value for getByteFrequencyData
+        var mappedWidth = Math.min((loudness / maxLoudnessValue) * 100, 100);
+        voiceLevel.style.width = mappedWidth + "%";
+
+        if (mappedWidth > 20) {
+          voiceLevel.style.backgroundColor = "green";
+        } else if (mappedWidth > 5) {
+          voiceLevel.style.backgroundColor = "yellow";
+        } else {
+          voiceLevel.style.backgroundColor = "red";
+        }
+        voiceLevel.style.width = loudness / 2 + "%";
+
+        if (loudness > minLoudnessThreshold) {
+          // var previousPosition = parseInt(balloonElement.style.left, 10) || 0;
+          clearTimeout(silenceTimeout);
+          clearInterval(silenceInterval);
+          silenceTimeout = null;
+          soundStopped = false;
+
+          var previousPosition = parseInt(balloonElement.style.left, 10);
+          var newPosition =
+            previousPosition +
+            ((maxX - minX) * (loudness - minLoudnessThreshold)) / 2500;
+          newPosition = Math.min(newPosition, maxX);
+          balloonElement.style.left = newPosition + "px";
+
+          var currentLeftPercentage = (newPosition - minX) / (maxX - minX);
+          score = Math.floor(currentLeftPercentage * 100);
+          document.getElementById("score").innerText = "Score: " + score;
+
+          if (newPosition >= maxX) {
+            clearInterval(updateInterval);
+            endGame(true);
+          }
+        } else {
+          if (!soundStopped && !easy) {
+            soundStopped = true;
+            if (!silenceTimeout) {
+              silenceTimeout = setTimeout(function () {
+                if (soundStopped && gameActive) {
+                  initiateSlowMove(minX, maxX);
+                }
+              }, 1000);
+            }
+          }
+        }
+      }
+
+      function initiateSlowMove(minX, maxX) {
+        clearInterval(updateInterval);
+        silenceInterval = setInterval(function () {
+          var balloonElement = document.getElementById("balloon");
+          var previousPosition = parseInt(balloonElement.style.left, 10);
+
+          var dataArray = new Uint8Array(analyser.frequencyBinCount);
+          analyser.getByteFrequencyData(dataArray);
+
+          var loudness =
+            dataArray.reduce((acc, val) => acc + val) / dataArray.length;
+          if (loudness > minLoudnessThreshold) {
+            clearInterval(silenceInterval);
+            updateInterval = setInterval(updateBalloonPosition, 100);
+            return;
+          }
+
+          var currentLeftPercentage = (previousPosition - minX) / (maxX - minX);
+          score = Math.floor(currentLeftPercentage * 100);
+          document.getElementById("score").innerText = "Score: " + score;
+        }, 1000);
+
+        if (!easy) {
+          if (medium) {
+            silenceTimeout = setTimeout(function () {
+              if (gameActive) {
+                clearInterval(silenceInterval);
+                clearInterval(timerInterval);
+                endGame(false);
+              }
+            }, 3000);
+          } else if (difficult) {
+            silenceTimeout = setTimeout(function () {
+              if (gameActive) {
+                clearInterval(silenceInterval);
+                clearInterval(timerInterval);
+                endGame(false);
+              }
+            }, 4000);
+          }
+        }
+      }
+
+      function endGame(isWin) {
+        if (!gameActive) return;
+        gameActive = false;
+        clearInterval(timerInterval);
+        clearInterval(updateInterval);
+        clearInterval(silenceInterval);
+        clearTimeout(silenceTimeout);
+
+        var timerElement = document.getElementById("timer");
+        toggleDifficultyButtons(false);
+
+        if (isWin) {
+          timerElement.style.color = "green";
+          timerElement.textContent = "You win!";
+        } else {
+          timerElement.style.color = "red";
+          timerElement.textContent = "Game over!";
+        }
+
+        submitScore(score);
+
+        document.getElementById("startButton").hidden = true;
+        document.getElementById("playAgainButton").hidden = false;
+        document.getElementById("finishButton").hidden = false;
+      }
+
+      function resetGameState() {
+        remainingTime = timeLimit;
+        score = 0;
+        soundStopped = false;
+        clearInterval(timerInterval);
+        clearInterval(updateInterval);
+        clearInterval(silenceInterval);
+        clearTimeout(silenceTimeout);
+        document.getElementById("score").innerText = "Score: 0";
+        // document.getElementById('timer').innerText = "Time left: " + timeLimit + " seconds";
+      }
+
+      function submitScore(finalScore) {
+        if (!sessionData || !sessionData.UserID || !sessionData.DisorderID) {
+          console.error("Session data is incomplete, cannot submit score");
+          return;
+        }
+
+        fetch("/submit_score", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            UserID: sessionData.UserID,
+            DisorderID: sessionData.DisorderID,
+            Score: finalScore,
+            GameName: "Loudness Blow Game",
+            LevelName: "No level",
+          }),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Failed to submit score");
+            }
+            return response.json();
+          })
+          .then((data) => {
+            console.log("Score submitted:", data);
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+      }
+
+      function restartGame() {
+        resetGameState();
+        var balloonElement = document.getElementById("balloon");
+        var boxElement = document.getElementById("box");
+        var pointA = document.querySelector(".point-a");
+        var minX =
+          boxElement.offsetLeft +
+          (parseFloat(pointA.style.left) / 100) * boxElement.offsetWidth;
+
+        balloonElement.style.left = minX + "px";
+
+        gameActive = false;
+        soundStopped = false;
+
+        document.getElementById("startButton").hidden = true;
+        document.getElementById("playAgainButton").hidden = true;
+        document.getElementById("finishButton").hidden = true;
+        document.getElementById("previousButton").hidden = true;
+        document.getElementById("easyButton").hidden = false;
+        document.getElementById("mediumButton").hidden = false;
+        document.getElementById("hardButton").hidden = false;
+        toggleDifficultyButtons(false);
+      }
+
+      function finishGame() {
+        document.getElementById("instruction").style.display = "none";
+
+        // Reset the game to its initial state
+
+        document.getElementById("easyButton").hidden = false;
+        document.getElementById("mediumButton").hidden = false;
+        document.getElementById("hardButton").hidden = false;
+        document.getElementById("previousButton").hidden = true;
+        resetGameState();
+        gameActive = false;
+        document.getElementById("balloon").style.left = "calc(6% + 12px)"; // Reset balloon position
+        document.getElementById("timer").innerText = "";
+        document.getElementById("score").innerText = "Score: 0";
+        document.getElementById("voiceLevel").style.width = "0%";
+
+        // Show difficulty buttons again
+        toggleDifficultyButtons(false);
+        document.getElementById("playAgainButton").hidden = true;
+        document.getElementById("finishButton").hidden = true;
+        document.getElementById("startButton").hidden = true; // Hide start button initially
+      }
+
+      function previous() {
+        console.log("previous button clicked");
+      }
+
+      function resetGameVisuals() {
+        var balloonElement = document.getElementById("balloon");
+        var boxElement = document.getElementById("box");
+        var pointA = document.querySelector(".point-a");
+        var minX =
+          boxElement.offsetLeft +
+          (parseFloat(pointA.style.left) / 100) * boxElement.offsetWidth;
+
+        balloonElement.style.left = minX + "px";
+        document.getElementById("voiceLevel").style.width = "0%";
+        document.getElementById("score").innerText = "Score: 0";
+        // document.getElementById('timer').innerText = "Time left: " + timeLimit + " seconds";
+      }
+
+      window.onload = function () {
+        fetchSessionData();
+        resetGameVisuals();
+      };
+    </script>
+  </body>
+</html>

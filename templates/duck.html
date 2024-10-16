@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Animal Game</title>
+  <!-- Include jQuery library -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <!-- <script src="{{ url_for('static', filename='scoreHandler.js') }}"></script> -->
+  <script src="{{ url_for('static', filename='js/scoresArray.js') }}"></script>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      width: 300px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .progress-bar {
+      width: 100%;
+      background-color: #f0f0f0;
+      border-radius: 10px;
+      margin-top: 20px;
+    }
+
+    .progress {
+      width: 0%;
+      height: 20px;
+      background-color: #4caf50;
+      border-radius: 10px;
+      transition: width 0.5s;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: center;
+      /* Center the buttons horizontally */
+      align-items: center;
+      /* Center the buttons vertically */
+      flex-wrap: nowrap;
+      /* Prevent wrapping to a new line */
+      margin-top: 20px;
+      /* Space above the controls */
+      gap: 5px;
+      /* Space between buttons */
+      overflow: hidden;
+      /* Prevent overflow */
+    }
+
+    .play-button,
+    .start-button,
+    .record-button {
+      padding: 8px 10px;
+      /* Reduce padding */
+      font-size: 14px;
+      /* Base font size */
+      color: white;
+      /* Text color */
+      border: none;
+      /* No border */
+      border-radius: 5px;
+      /* Rounded corners */
+      cursor: pointer;
+      /* Pointer cursor on hover */
+      flex: 1;
+      /* Allow buttons to grow evenly */
+      min-width: 50px;
+      /* Set a minimum width to prevent button from becoming too small */
+      max-width: 100px;
+      /* Limit maximum width */
+    }
+
+    /* Specific styles for buttons */
+    .play-button {
+      background-color: #4c98af;
+    }
+
+    .start-button,
+    .exit-button {
+      background-color: #4caf50;
+    }
+
+    .restart-button {
+      background-color: #ff9800;
+      display: none;
+      /* Remain hidden unless condition is met */
+    }
+
+    /* Media query for very small screens */
+    @media (max-width: 350px) {
+      .controls {
+        flex-direction: row;
+        /* Stack buttons vertically on very small screens */
+        justify-content: center;
+        /* Stretch buttons to fill the container */
+        justify-items: center;
+        align-items: center;
+      }
+
+      .play-button,
+      .start-button,
+      .record-button {
+        padding: 6px;
+        /* Uniform padding for vertical layout */
+        font-size: 14px;
+        /* Maintain font size */
+        flex: none;
+        /* Prevent buttons from flexing to fit the space */
+        width: 100%;
+        /* Make buttons full width */
+        max-width: 80px;
+        /* Remove max-width constraint */
+      }
+    }
+
+    /* Media query for small screens */
+    @media (min-width: 351px) and (max-width: 600px) {
+      .controls {
+        justify-content: space-around;
+        /* Space buttons evenly */
+      }
+
+      .play-button,
+      .start-button,
+      .record-button {
+        padding: 8px;
+        /* Uniform padding */
+        font-size: 14px;
+        /* Maintain font size */
+        flex: 1;
+        /* Allow buttons to grow evenly */
+      }
+    }
+
+
+
+    .back {
+      width: fit-content;
+      padding: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <!--<div class="class">
+      <h1>Level 1</h1>
+    </div>
+    <div class="back">
+        <a href="/dashboard/index.html"
+           > <!-- <img src="../static/images/back.png" width="30" height="30"/> --></a>
+  </div> -->
+  <h1>Sound of Duck</h1>
+  <div>
+    <div>
+      <img src="../static/images/duck.png" height="90" width="90" alt="horse" class="img" />
+    </div>
+    <span>
+      <small>"Quack Quack"</small>
+    </span>
+  </div>
+  <div class="progress-bar">
+    <div class="progress"></div>
+  </div>
+  <div class="progress-bar">
+    <div class="progress"></div>
+  </div>
+
+
+  <div class="controls">
+    <div id="duck" class="animal">
+      <button class="play-button"><audio></audio>Play</button>
+    </div>
+    <button id="action" class="start-button" onclick="runSpeechRecog()">
+      Record
+    </button>
+    <button id="next-button" class="exit-button start-button">Next</button>
+
+  </div>
+  <!-- <span>
+        <h3>Your speech:</h3>
+        <h4 id="output" class="hide"></h4>
+      </span> -->
+  <span>
+    <h3>Your Result:</h3>
+    <h4 id="result" class="hide"></h4>
+  </span>
+  </div>
+
+  <script>
+    let win = false;
+    let speech;
+
+    $(".animal").on("click", function () {
+      var audio = $(this).find("audio")[0]; // Get the native audio element
+      $(audio).on("timeupdate", function () {
+        var progress = (audio.currentTime / audio.duration) * 100; // Calculate progress percentage
+        $(".progress").css("width", progress + "%"); // Update progress bar width
+      });
+      audio.play(); // Start playing the audio
+      console.log("Playing");
+    });
+
+    baseUrl = "//google.com/logos/fnbx/animal_sounds/";
+
+    $.each($(".animal img"), function (k, v) {
+      $(this).attr("src", baseUrl + $(v).closest("div").attr("id") + ".png");
+    });
+
+    $.each($(".animal audio"), function (k, v) {
+      $(this).attr("src", baseUrl + $(v).closest("div").attr("id") + ".mp3");
+    });
+
+
+    function addScore(score, level) {
+      const animal = "duck"; // Change this based on the specific animal
+      const scoreKey = `${animal}_${level}_score`;
+
+      // Store the score in localStorage
+      localStorage.setItem(scoreKey, score);
+
+      // Optionally, log to verify it's working
+      console.log(`Score for ${animal} level ${level}: ${score}`);
+    }
+
+    // Function to update the progress bar
+    function updateProgressBar(color, width) {
+      const progressBar = document.querySelector(".progress");
+      progressBar.style.width = width;
+      progressBar.style.backgroundColor = color;
+    }
+
+    let recordedAudioBlob; // This will store the blob from client recording
+    const audioFileName = 'output.wav'; // Default filename for recordings
+    // Function to record audio on the server
+    function recordAudioToServer(duration) {
+      return fetch('http://127.0.0.1:5001/record', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          filename: audioFileName,
+          duration: duration // Duration of the recording in seconds
+        }),
+      })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok');
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log(data.message); // Log success message
+        })
+        .catch(error => {
+          console.error('Error:', error);
+        });
+    }
+
+    // Function to play the recorded audio
+    function playRecording() {
+      const audioUrl = `http://127.0.0.1:5001/audio/${audioFileName}?t=${new Date().getTime()}`;
+      const audioPlayback = new Audio(audioUrl);
+      audioPlayback.play();
+      console.log("Playing recorded audio...");
+    }
+    runSpeechRecog = () => {
+      var action = document.getElementById("action");
+      var result = document.getElementById("result");
+      const recordDuration = 5; // Set the duration for recording in seconds
+      recordAudioToServer(recordDuration).then(() => {
+        document.getElementById("action").innerHTML = "Record"; // Reset button text after recording
+      });
+
+
+      let recognition = new webkitSpeechRecognition();
+      recognition.onstart = () => {
+        action.innerHTML = "Recording...";
+      };
+      recognition.onresult = (e) => {
+        var transcript = e.results[0][0].transcript;
+        speech = e.results[0][0].transcript;
+        console.log(speech)
+        action.innerHTML = "Record";
+
+        if (
+          speech.toLowerCase() === "quack quack" ||
+          speech.toLowerCase() === "quack" ||
+          speech.toLowerCase() === "quack quack quack"
+        ) {
+          win = true;
+          if (win) {
+            addScore(100, 'level1');
+            result.innerHTML = "You passed it!";
+            result.style.color = "green"; // Set text color to green
+            updateProgressBar("green", "100%"); // Turn progress bar green and fill it
+          }
+        } else {
+          win = false;
+          addScore(0, 'level1');
+          result.innerHTML = "Game Over!";
+          result.style.color = "red"; // Set text color to red
+          updateProgressBar("red", "100%");
+        }
+        result.classList.remove("hide");
+        document.querySelector(".restart-button").style.display = "block"; // Turn progress bar red and fill it
+        document.querySelector(".restart-button").style.display = "block";
+      };
+      recognition.onerror = (e) => {
+        action.innerHTML = "Record";
+        result.innerHTML = "Error occurred: " + e.error;
+        result.style.color = "red"; // Set text color to red
+        result.classList.remove("hide");
+
+        // Update the progress bar to red on error
+        updateProgressBar("red", "100%");
+        document.querySelector(".restart-button").style.display = "block";
+      };
+      recognition.start();
+    };
+    function getCurrentPageName() {
+      const path = window.location.pathname;
+      return path.split("/").pop();
+    }
+
+    // Function to get the next page link
+    function getNextPageLink() {
+      const currentPage = getCurrentPageName();
+      const currentIndex = scores.findIndex(item => item.link.includes(currentPage));
+      // If currentIndex is not found or is the last item, loop to the first page or stay on the last page (up to your requirement)
+      if (currentIndex === -1 || currentIndex === scores.length - 1) {
+        return "level1"; // Redirect to 'level1.html' if last item or not found
+      } else {
+        return scores[currentIndex + 1].link; // Get the next page link
+      }
+    }
+
+    // Modify the "Next" button's onclick event
+    document.getElementById('next-button').onclick = function () {
+      if (!win) {
+        addScore(0, 'level1')
+      }
+      const nextPageLink = getNextPageLink();
+      window.location.href = nextPageLink;
+    };
+    function getPreviousPageLink() {
+      const currentPage = getCurrentPageName();
+      const currentIndex = scores.findIndex(item => item.link.includes(currentPage))
+      if (currentIndex === 0) {
+        return scores[scores.length - 1].link; // Redirect to 'level1.html' if last item or not found
+      } else {
+        return scores[currentIndex - 1].link; // Get the next page link
+      }
+    }
+
+
+    document.getElementById('previous-button').onclick = function () {
+      if (!win) {
+        addScore(0, 'level1')
+      }
+      // PreviousButtonClicked = true
+      const previousPageLink = getPreviousPageLink();
+      window.location.href = previousPageLink;
+    };
+
+    function finishGame() {
+      // Redirect to the finish page or to a summary page
+      window.location.href = "finish_animal_level1"; // Change this to your desired finish page or functionality
+    }
+
+
+  </script>
+</body>
+
+</html>

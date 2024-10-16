@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Include Bootstrap CSS and JS in your HTML -->
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <title>Food Game</title>
+    <style>
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh; /* Changed from height to min-height */
+        margin: 0;
+        font-family: Arial, sans-serif; /* Consistent font family */
+        background-color: #f0f0f0; /* Changed to match the other pages */
+      }
+
+      .container {
+        width: 90%;
+        max-width: 400px;
+        margin: 0 auto;
+        text-align: center;
+        padding: 20px;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      }
+
+      .heading {
+        padding: 5px;
+        margin-bottom: 100px;
+      }
+
+      .heading {
+        display: flex;
+        align-items: center; /* Center align items vertically */
+        margin-bottom: 10px;
+      }
+
+      .heading-left {
+        margin-right: 10px; /* Add some space between the logo and text */
+      }
+
+      .heading-left img {
+        width: 40px;
+        height: 55px;
+      }
+
+      .heading-left span {
+        font-size: 1 rem;
+        font-weight: bold;
+        margin-left: 10px;
+        color: #333;
+      }
+
+      .heading h1 {
+        font-size: 1.5rem;
+        font-weight: bold;
+        margin: 0;
+        color: #333;
+        flex-grow: 1;
+        text-align: center;
+        margin-right: 17 0px;
+      }
+      .heading h3 {
+        font-size: medium;
+      }
+
+      .grid-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+        gap: 10px;
+        margin-top: 20px;
+      }
+
+      .grid-item {
+        background-color: #83a1da;
+        border: 1px solid #999999;
+        padding: 10px;
+        text-align: center;
+        font-size: 16px;
+        border-radius: 5px;
+        cursor: pointer;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+
+      .grid-item:hover {
+        background-color: #ffffff;
+        border-color: #83a1da;
+      }
+
+      #score {
+        font-weight: 600;
+        font-size: 18px;
+        color: black;
+        margin-top: 20px;
+      }
+
+      .grid-img {
+        height: 55px;
+        margin-bottom: 10px;
+      }
+
+      .grid-link {
+        color: white;
+        font-weight: 500;
+        text-decoration: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .grid-link:hover {
+        color: #83a1da;
+      }
+
+      button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      .exit-button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 16px;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        background-color: #f44336;
+      }
+
+      @media (max-width: 400px) {
+        .grid-item {
+          padding: 5px;
+          font-size: 14px;
+        }
+
+        .grid-img {
+          height: 40px;
+          margin-bottom: 5px;
+        }
+
+        button,
+        .exit-button {
+          padding: 8px 16px;
+          font-size: 14px;
+        }
+      }
+
+      h3 {
+        font-size: 1.25rem;
+      }
+
+      @media (max-width: 576px) {
+        h3 {
+          font-size: 1rem;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div
+      class="modal fade"
+      id="customAlert"
+      tabindex="-1"
+      aria-labelledby="modalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalLabel">Alert</h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body" id="modalBody">
+            Start from the first Game.
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="modal fade"
+      id="customAlert"
+      tabindex="-1"
+      aria-labelledby="modalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="modalLabel">Alert</h5>
+            <button
+              type="button"
+              class="close"
+              data-dismiss="modal"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body" id="modalBody">
+            Start from the first Game.
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container">
+      <div class="heading">
+        <h1>Level 2</h1>
+      </div>
+      <div class="heading">
+        <div class="heading-left">
+          <img src="/static/images/logo 3.jpg" alt="Logo" />
+        </div>
+        <h3>Click on the First Food (Orange Card) to start your game.</h3>
+      </div>
+      <div class="grid-container" id="gridContainer">
+        <!-- Grid items will be dynamically generated here -->
+      </div>
+      <div id="score"></div>
+      <!-- <button class="exit-button" onclick="clearAndExit()">Exit</button> -->
+      <button onclick="submitScores()">Exit</button>
+    </div>
+    <script>
+      function showAlert(message) {
+        document.getElementById("modalBody").innerText = message; // Set the alert message
+        $("#customAlert").modal("show"); // Show the modal
+      }
+
+      function clearAndExit() {
+        localStorage.removeItem("orange_level2_score");
+        localStorage.removeItem("apple_level2_score");
+        localStorage.removeItem("banana_level2_score");
+        localStorage.removeItem("water_level2_score");
+        localStorage.removeItem("juice_level2_score");
+        localStorage.removeItem("milkshake_level2_score");
+        localStorage.removeItem("egg_level2_score");
+        localStorage.removeItem("potato_level2_score");
+        localStorage.removeItem("rice_level2_score");
+
+        // Redirect to 'levels.html'
+        location.href = "exit_food_levels";
+      }
+      let sessionData = {};
+      const scores = [
+        {
+          id: 1,
+          name: "Orange",
+          img: "/static/images/orange.gif",
+          link: "orange_level2",
+          storageKey: "orange_level2_score",
+        },
+        {
+          id: 2,
+          name: "Apple",
+          img: "/static/images/apple.gif",
+          link: "apple_level2",
+          storageKey: "apple_level2_score",
+        },
+        {
+          id: 3,
+          name: "Banana",
+          img: "/static/images/banana.gif",
+          link: "banana_level2",
+          storageKey: "banana_level2_score",
+        },
+        {
+          id: 4,
+          name: "Water",
+          img: "/static/images/water.gif",
+          link: "water_level2",
+          storageKey: "water_level2_score",
+        },
+        {
+          id: 5,
+          name: "Juice",
+          img: "/static/images/juice.gif",
+          link: "juice_level2",
+          storageKey: "juice_level2_score",
+        },
+        {
+          id: 6,
+          name: "Milkshake",
+          img: "/static/images/milkshake.gif",
+          link: "milkshake_level2",
+          storageKey: "milkshake_level2_score",
+        },
+        {
+          id: 7,
+          name: "Egg",
+          img: "/static/images/egg.gif",
+          link: "egg_level2",
+          storageKey: "egg_level2_score",
+        },
+        {
+          id: 8,
+          name: "Potato",
+          img: "/static/images/potato.gif",
+          link: "potato_level2",
+          storageKey: "potato_level2_score",
+        },
+        {
+          id: 9,
+          name: "Rice",
+          img: "/static/images/rice.gif",
+          link: "rice_level2",
+          storageKey: "rice_level2_score",
+        },
+      ];
+
+      // Fetch session data
+      function fetchSessionData() {
+        return fetch("/get_session_data")
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Failed to fetch session data");
+            }
+            return response.json();
+          })
+          .then((data) => {
+            sessionData = data;
+            console.log("Session Data:", sessionData);
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+      }
+
+      // Generate grid items
+      function generateGridItems(scores) {
+        const gridContainer = document.getElementById("gridContainer");
+        scores.forEach(function (score) {
+          const gridItem = document.createElement("div");
+          gridItem.classList.add("grid-item");
+          const gridLink = document.createElement("a");
+          gridLink.addEventListener("click", function (event) {
+            if (score.id > 1) {
+              event.preventDefault(); // Prevent the default action of the link
+              showAlert("Start from the first Game"); // Use custom alert function
+            } else {
+              gridLink.href = score.link; // Assign the link only for id = 1
+            }
+          });
+          if (score.id === 1) {
+            gridLink.href = score.link;
+          }
+          gridLink.classList.add("grid-link");
+          const gridImg = document.createElement("img");
+          gridImg.src = score.img;
+          gridImg.alt = score.name;
+          gridImg.classList.add("grid-img");
+          gridLink.appendChild(gridImg);
+          gridLink.append(document.createTextNode(score.name));
+          const gridText = document.createElement("div");
+          const storedScore = localStorage.getItem(score.storageKey);
+          if (storedScore) {
+            gridText.innerHTML = ` <br/> Score: ${storedScore}`;
+            gridLink.appendChild(gridText);
+          }
+          gridItem.appendChild(gridLink);
+          gridContainer.appendChild(gridItem);
+        });
+      }
+
+      // Calculate total score
+      function calculateTotalScore(scores) {
+        const scorePerCard = 100 / scores.length;
+        let numCardsWithPerfectScore = 0;
+
+        scores.forEach(function (score) {
+          const storedScore = localStorage.getItem(score.storageKey);
+          if (storedScore && parseInt(storedScore, 10) === 100) {
+            numCardsWithPerfectScore += 1;
+          }
+        });
+
+        const totalScore = numCardsWithPerfectScore * scorePerCard;
+        return totalScore;
+      }
+
+      // Render total score
+      function renderTotalScore() {
+        const totalScore = calculateTotalScore(scores);
+        document.getElementById("score").textContent =
+          "Total Score: " + totalScore.toFixed(2);
+      }
+
+      // Submit scores
+      function submitScores() {
+        const totalScore = calculateTotalScore(scores);
+        if (!sessionData.UserID || !sessionData.DisorderID) {
+          console.error("Session data is incomplete, cannot submit score");
+          return;
+        }
+
+        fetch("/submit_score", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            UserID: sessionData.UserID,
+            DisorderID: sessionData.DisorderID,
+            Score: totalScore,
+            GameName: "Food Object Game",
+            LevelName: "Level 2",
+          }),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Failed to submit score");
+            }
+            return response.json();
+          })
+          .then((data) => {
+            console.log("Score submitted:", data);
+            document.getElementById("score").textContent =
+              "Total Score: " + totalScore.toFixed(2);
+          })
+          .catch((error) => console.error("Error:", error));
+        clearAndExit();
+      }
+
+      // On DOM load
+      document.addEventListener("DOMContentLoaded", function () {
+        fetchSessionData().then(() => {
+          generateGridItems(scores);
+          renderTotalScore();
+        });
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Level Selection</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+      }
+
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh; /* Changed from height to min-height */
+        margin: 0;
+        font-family: Arial, sans-serif; /* Consistent font family */
+        background-color: #f0f0f0; /* Changed to match the other pages */
+      }
+
+      .container {
+        display: flex;
+        flex-direction: column;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+        align-items: center;
+        max-width: 600px;
+        min-height: 300px;
+      }
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 20px;
+      }
+
+      .header img {
+        width: 50px;
+        height: 50px;
+      }
+
+      .header p {
+        font-size: 28px;
+        font-weight: bold;
+        color: #333;
+        margin: 0;
+      }
+
+      h1 {
+        font-size: 32px;
+        color: #333;
+        margin-bottom: 20px;
+        white-space: nowrap;
+      }
+
+      .card {
+        display: flex;
+        justify-content: center;
+        text-align: center;
+        align-items: center;
+        background-color: #ffffff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        padding: 20px 40px;
+        text-align: center;
+        transition: transform 0.3s, box-shadow 0.3s;
+        cursor: pointer;
+        flex: none;
+
+        width: 200px;
+
+        margin: 0;
+      }
+
+      .card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      }
+
+      .card h2 {
+        font-size: 24px;
+        color: #333;
+        margin-bottom: 10px;
+      }
+
+      .exit-button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 20px 25px;
+        text-align: center;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.3s;
+        flex: 1;
+        min-width: 150px;
+        max-width: 300px;
+        margin-top: 20px;
+        font-size: 18px;
+      }
+
+      .exit-button:hover {
+        background-color: #0056b3;
+        transform: translateY(-5px);
+      }
+
+      @media (max-width: 500px) {
+        h1 {
+          font-size: 32px;
+          white-space: nowrap;
+        }
+        .card {
+          padding: 15px 30px;
+          height: 72px;
+
+          width: 100%;
+
+          max-width: 200px;
+        }
+
+        .card h2 {
+          font-size: 20px;
+        }
+
+        .exit-button {
+          padding: 15px 30px; /* Match the padding of the card */
+          font-size: 16px;
+          width: 100%;
+          max-width: 200px; /* Match the width of the card */
+          margin-top: 20px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="header">
+        <img src="/static/images/logo 2.jpg" alt="Logo" />
+        <p>IzzyAI</p>
+      </div>
+      <div id="heading">
+        <h1>Voice Testing Game</h1>
+      </div>
+      <div class="card" onclick="location.href='/game2_testing_easy_level'">
+        <h2>Easy Level</h2>
+      </div>
+      <div class="card" onclick="location.href='/game2_testing_medium_level'">
+        <h2>Medium Level</h2>
+      </div>
+      <div
+        class="card"
+        onclick="location.href='/game2_testing_difficult_level'"
+      >
+        <h2>Difficult Level</h2>
+      </div>
+      <button class="exit-button" onclick="location.href='/exit_game2_levels'">
+        Exit
+      </button>
+    </div>
+  </body>
+</html>

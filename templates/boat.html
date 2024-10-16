@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Transport Game</title>
+    <!-- Include jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <!-- <script src="{{ url_for('static', filename='scoreHandler.js') }}"></script> -->
+    <script src="{{ url_for('static', filename='js/scoresArray.js') }}"></script>
+    <style>
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        flex-direction: column;
+        font-family: Arial, sans-serif;
+      }
+
+      .container {
+        width: 350px;
+        margin: 0 auto;
+        text-align: center;
+      }
+      .container h1 {
+        font-size: 1.9rem;
+        font-weight: bold;
+        margin: 0;
+        color: #333;
+        flex-grow: 1;
+        text-align: center;
+
+        margin-bottom: 20px;
+      }
+
+      .card {
+        background-color: #ffffff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        padding: 20px;
+        margin: 20px auto;
+      }
+
+      .card img {
+        height: 100px; /* Set the fixed height */
+        width: auto; /* Allow the width to adjust proportionally */
+        border-radius: 8px;
+        margin: 10px 0;
+      }
+
+      .card h2 {
+        font-size: 18px;
+        color: #333;
+        margin: 10px 0;
+      }
+
+      .play-button,
+      .restart-button,
+      .finish-button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 16px;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .start-button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-left: 2px;
+      }
+
+      .play-button {
+        background-color: #4c98af;
+      }
+
+      .record-button {
+        background-color: #4caf50;
+      }
+
+      .restart-button {
+        background-color: #ff9800;
+        display: none;
+      }
+
+      .exit-button {
+        background-color: #4caf50;
+      }
+
+      .finish-button {
+        background-color: #f44336;
+        /* Red color for Finish button */
+        display: block;
+        /* Ensures the button behaves like a block element */
+        width: 30%;
+        /* Full width for better usability */
+      }
+
+      .progress-bar {
+        width: 100%;
+        background-color: #f0f0f0;
+        border-radius: 10px;
+        margin-top: 20px;
+      }
+
+      .progress {
+        width: 0%;
+        height: 20px;
+        background-color: #4caf50;
+        border-radius: 10px;
+        transition: width 0.5s;
+      }
+
+      .controls {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+        gap: 2px;
+        flex-wrap: nowrap;
+      }
+      .controls button {
+        flex: 1;
+        min-width: 60px;
+        max-width: 80px;
+        height: 30px;
+        padding: 3px;
+        font-size: 12px;
+      }
+      .logo-paragraph-wrapper {
+        display: flex;
+        align-items: center; /* Ensure both logo and paragraph are vertically aligned */
+        gap: 10px; /* Add space between the logo and the paragraph */
+      }
+
+      .logo-container {
+        display: flex;
+        justify-content: center;
+        align-items: center; /* Center the logo within its container */
+      }
+
+      .logo-img {
+        height: 55px;
+        width: 40px;
+        margin-right: 20px;
+      }
+
+      .paragraph-container {
+        display: inline; /* Change from 'flex' to 'inline' */
+        white-space: nowrap; /* Prevent text from wrapping to the next line */
+      }
+
+      @media (max-width: 480px) {
+        .logo-paragraph-container {
+          justify-content: center; /* Optional: center align for small screens */
+        }
+
+        .controls {
+          justify-content: center;
+          gap: 1px;
+        }
+
+        .controls button {
+          flex-basis: auto;
+          min-width: 50px;
+          max-width: 70px;
+          height: 28px;
+        }
+      }
+
+      .record {
+        height: 32px !important;
+        transform: translateY(-2px);
+      }
+
+      .hide {
+        visibility: hidden;
+      }
+
+      .win {
+        color: green;
+      }
+
+      .lose {
+        color: red;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>Level 1</h1>
+
+      <div class="logo-paragraph-wrapper">
+        <div class="logo-container">
+          <img
+            src="/static/images/logo 3.jpg"
+            height="50"
+            width="50"
+            alt="Logo"
+            class="logo-img"
+          />
+        </div>
+        <div class="paragraph-container">
+          <p>Say the sound loud to get full score.</p>
+        </div>
+      </div>
+      <div class="back">
+        <a href="./transp_level1.html">
+          <!-- <img src="../static/images/back.png" width="30" height="30"/> --></a
+        >
+      </div>
+      <h2>Sound of Boat</h2>
+      <div>
+        <div>
+          <img
+            src="../static/images/boat-ezgif.com-crop.gif"
+            height="90"
+            width="90"
+            alt="cow"
+            class="img"
+          />
+        </div>
+        <span>
+          <small> "Splash Splash"</small>
+        </span>
+      </div>
+      <div class="progress-bar">
+        <div class="progress"></div>
+      </div>
+
+      <div class="controls">
+        <button id="previous-button" class="exit-button start-button">
+          Previous
+        </button>
+        <div id="boat" class="animal">
+          <button class="play-button">
+            Play
+            <audio
+              src="../static/audiofiles/zapsplat_vehicles_boat_single_oar_paddling_rowing_002_97757.mp3"
+            ></audio>
+          </button>
+        </div>
+        <button
+          id="action"
+          class="record-button start-button"
+          onclick="runSpeechRecog()"
+        >
+          Record
+        </button>
+        <button class="restart-button record" onclick="playRecording()">
+          Play Recording
+        </button>
+        <button
+          id="next-button"
+          class="exit-button start-button"
+          onclick="history.back()"
+        >
+          Next
+        </button>
+      </div>
+
+      <div style="display: flex; justify-content: center; margin-top: 4px">
+        <button class="finish-button" onclick="finishGame()">Finish</button>
+      </div>
+      <span>
+        <h3>Your Result:</h3>
+        <h4 id="result" class="hide"></h4>
+      </span>
+    </div>
+
+    <script>
+      let win = false;
+      let speech;
+      let recordedAudioBlob; // This will store the blob from client recording
+      const audioFileName = "output.wav"; // Default filename for recordings
+      const recordDuration = 5; // Duration for recording in seconds
+
+      // Variables for recording
+      let mediaRecorder;
+      let audioChunks = [];
+
+      // Play the boat sound and update progress bar
+      $(".play-button").on("click", function () {
+        var audio = $(this).find("audio")[0]; // Get the native audio element
+        $(audio).on("timeupdate", function () {
+          var progress = (audio.currentTime / audio.duration) * 100; // Calculate progress percentage
+          $(".progress").css("width", progress + "%"); // Update progress bar width
+        });
+        audio.play(); // Start playing the audio
+        console.log("Playing boat sound");
+      });
+
+      // Add score to localStorage
+      function addScore(score, level) {
+        const animal = "boat"; // Change this based on the specific animal
+        const scoreKey = `${animal}_${level}_score`;
+        localStorage.setItem(scoreKey, score); // Store the score in localStorage
+        console.log(`Score for ${animal} level ${level}: ${score}`);
+      }
+
+      // Update the progress bar's appearance
+      function updateProgressBar(color, width) {
+        const progressBar = document.querySelector(".progress");
+        progressBar.style.width = width;
+        progressBar.style.backgroundColor = color;
+      }
+
+      // Start recording the audio
+      function startRecording() {
+        navigator.mediaDevices.getUserMedia({ audio: true }).then((stream) => {
+          mediaRecorder = new MediaRecorder(stream);
+          mediaRecorder.start();
+
+          // Collect audio data as it's being recorded
+          mediaRecorder.ondataavailable = (event) => {
+            audioChunks.push(event.data);
+          };
+
+          mediaRecorder.onstop = () => {
+            recordedAudioBlob = new Blob(audioChunks, { type: "audio/wav" });
+            audioChunks = []; // Reset the chunks after recording is done
+            saveRecordingToServer(recordedAudioBlob); // Save the recording to the server
+          };
+
+          // Stop recording after the specified duration
+          setTimeout(() => {
+            mediaRecorder.stop();
+          }, recordDuration * 1000); // Convert duration to milliseconds
+        });
+      }
+
+      // Save the recorded audio to the server
+      function saveRecordingToServer(blob) {
+        const formData = new FormData();
+        formData.append("audio_data", blob, audioFileName);
+
+        fetch("http://127.0.0.1:5001/save_audio", {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Network response was not ok");
+            }
+            return response.json();
+          })
+          .then((data) => {
+            console.log("Audio saved successfully:", data.message);
+          })
+          .catch((error) => {
+            console.error("Error uploading audio:", error);
+          });
+      }
+
+      // Play the recorded audio from the server
+      function playRecording() {
+        console.log("Attempting to play the recorded audio...");
+        if (!recordedAudioBlob) {
+          console.error("No audio recorded to play.");
+          return;
+        }
+
+        const audioUrl = URL.createObjectURL(recordedAudioBlob);
+        const audioPlayback = new Audio(audioUrl);
+        audioPlayback.play();
+        console.log("Playing recorded audio...");
+      }
+
+      // Speech recognition with recording
+      function runSpeechRecog() {
+        var action = document.getElementById("action");
+        var result = document.getElementById("result");
+
+        // Start recording the audio
+        startRecording();
+
+        updateProgressBar("#f0f0f0", "0%"); // Reset the progress bar
+
+        let recognition = new webkitSpeechRecognition();
+        recognition.onstart = () => {
+          action.innerHTML = "Recording...";
+        };
+
+        recognition.onresult = (e) => {
+          var transcript = e.results[0][0].transcript;
+          speech = e.results[0][0].transcript.toLowerCase();
+          console.log(speech);
+          action.innerHTML = "Record";
+
+          // Handle speech recognition result
+          if (
+            speech === "splash splash" ||
+            speech === "splash" ||
+            speech === "splash splash splash" ||
+            speech === "splash splash splash splash"
+          ) {
+            win = true;
+            addScore(100, "level1");
+            result.innerHTML = "You passed it! <br> Score: 100";
+            result.style.color = "green"; // Set text color to green
+            updateProgressBar("green", "100%"); // Turn progress bar green and fill it
+          } else {
+            win = false;
+            addScore(0, "level1");
+            result.innerHTML = "Game Over! <br> Score: 0";
+            result.style.color = "red"; // Set text color to red
+            updateProgressBar("red", "100%"); // Turn progress bar red and fill it
+          }
+
+          result.classList.remove("hide");
+          document.querySelector(".restart-button").style.display = "block"; // Show the restart button
+        };
+
+        recognition.onerror = (e) => {
+          action.innerHTML = "Record";
+          result.innerHTML = "Error occurred: " + e.error;
+          result.style.color = "red"; // Set text color to red
+          result.classList.remove("hide");
+
+          // Update the progress bar to red on error
+          updateProgressBar("red", "100%");
+          document.querySelector(".restart-button").style.display = "block";
+        };
+
+        recognition.start();
+      }
+
+      // Get the current page name
+      function getCurrentPageName() {
+        const path = window.location.pathname;
+        return path.split("/").pop();
+      }
+
+      // Get the next page link
+      function getNextPageLink() {
+        const currentPage = getCurrentPageName();
+        const currentIndex = scores3.findIndex((item) =>
+          item.link.includes(currentPage)
+        );
+
+        // If currentIndex is not found or is the last item, loop to the first page or stay on the last page
+        if (currentIndex === -1 || currentIndex === scores3.length - 1) {
+          return "transp_level1"; // Redirect to 'level1.html' if last item or not found
+        } else {
+          return scores3[currentIndex + 1].link; // Get the next page link
+        }
+      }
+
+      // Modify the "Next" button's onclick event
+      document.getElementById("next-button").onclick = function () {
+        if (!win) {
+          addScore(0, "level1");
+        }
+        const nextPageLink = getNextPageLink();
+        window.location.href = nextPageLink;
+      };
+
+      // Get the previous page link
+      function getPreviousPageLink() {
+        const currentPage = getCurrentPageName();
+        const currentIndex = scores3.findIndex((item) =>
+          item.link.includes(currentPage)
+        );
+
+        if (currentIndex === 0) {
+          return scores3[scores3.length - 1].link; // Redirect to the last item if on the first page
+        } else {
+          return scores3[currentIndex - 1].link; // Get the previous page link
+        }
+      }
+
+      // Modify the "Previous" button's onclick event
+      document.getElementById("previous-button").onclick = function () {
+        if (!win) {
+          addScore(0, "level1");
+        }
+        const previousPageLink = getPreviousPageLink();
+        window.location.href = previousPageLink;
+      };
+
+      // Finish the game
+      function finishGame() {
+        window.location.href = "finish_transport_level1"; // Redirect to the finish page or summary page
+      }
+    </script>
+  </body>
+</html>

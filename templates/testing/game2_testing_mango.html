@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="{{ url_for('static', filename='js/scoresArray.js') }}"></script>
+    <title>Mango Page</title>
+    <style>
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        flex-direction: column;
+        font-family: Arial, sans-serif;
+      }
+
+      .container {
+        width: 350px;
+        margin: 0 auto;
+        text-align: center;
+      }
+      .container h1 {
+        font-size: 1.9rem;
+        font-weight: bold;
+        margin: 0;
+        color: #333;
+        flex-grow: 1;
+        text-align: center;
+
+        margin-bottom: 20px;
+      }
+
+      .card {
+        background-color: #ffffff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        padding: 20px;
+        margin: 20px auto;
+      }
+
+      .card img {
+        height: 100px; /* Set the fixed height */
+        width: auto; /* Allow the width to adjust proportionally */
+        border-radius: 8px;
+        margin: 10px 0;
+      }
+
+      .card h2 {
+        font-size: 18px;
+        color: #333;
+        margin: 10px 0;
+      }
+
+      .play-button,
+      .restart-button,
+      .finish-button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 16px;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .start-button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-left: 2px;
+      }
+
+      .play-button {
+        background-color: #4c98af;
+      }
+
+      .record-button {
+        background-color: #4caf50;
+      }
+
+      .restart-button {
+        background-color: #ff9800;
+        display: none;
+      }
+
+      .exit-button {
+        background-color: #4caf50;
+      }
+
+      .finish-button {
+        background-color: #f44336;
+        /* Red color for Finish button */
+        display: block;
+        /* Ensures the button behaves like a block element */
+        width: 30%;
+        /* Full width for better usability */
+      }
+
+      .progress-bar {
+        width: 100%;
+        background-color: #f0f0f0;
+        border-radius: 10px;
+        margin-top: 20px;
+      }
+
+      .progress {
+        width: 0%;
+        height: 20px;
+        background-color: #4caf50;
+        border-radius: 10px;
+        transition: width 0.5s;
+      }
+
+      .controls {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+        gap: 2px;
+        flex-wrap: nowrap;
+      }
+      .controls button {
+        flex: 1;
+        min-width: 60px;
+        max-width: 80px;
+        height: 30px;
+        padding: 3px;
+        font-size: 12px;
+      }
+      .logo-paragraph-wrapper {
+        display: flex;
+        align-items: center; /* Ensure both logo and paragraph are vertically aligned */
+      }
+
+      .logo-container {
+        display: flex;
+        justify-content: center;
+        align-items: center; /* Center the logo within its container */
+        margin-left: 30px;
+      }
+
+      .logo-img {
+        height: 55px;
+        width: 40px;
+        margin-right: 20px;
+      }
+
+      .paragraph-container {
+        display: inline; /* Change from 'flex' to 'inline' */
+        white-space: nowrap; /* Prevent text from wrapping to the next line */
+      }
+
+      @media (max-width: 480px) {
+        .logo-paragraph-container {
+          justify-content: center; /* Optional: center align for small screens */
+        }
+
+        .controls {
+          justify-content: center;
+          gap: 1px;
+        }
+
+        .controls button {
+          flex-basis: auto;
+          min-width: 50px;
+          max-width: 70px;
+          height: 28px;
+        }
+      }
+
+      .record {
+        height: 32px !important;
+        transform: translateY(-2px);
+      }
+
+      .hide {
+        visibility: hidden;
+      }
+
+      .win {
+        color: green;
+      }
+
+      .lose {
+        color: red;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>Testing Easy Level</h1>
+
+      <div class="logo-paragraph-wrapper">
+        <div class="logo-container">
+          <img
+            src="/static/images/logo 3.jpg"
+            height="50"
+            width="50"
+            alt="Logo"
+            class="logo-img"
+          />
+        </div>
+        <div class="paragraph-container">
+          <p>Record your answer in 1 word.</p>
+        </div>
+      </div>
+      <h2>Which concept is shown in this picture?</h2>
+      <div class="card">
+        <!-- <h2>This is a in</h2> -->
+        <img
+          src="../../static/images/mango.gif"
+          height="100"
+          width="120"
+          alt="in Image"
+        />
+      </div>
+      <div class="progress-bar">
+        <div class="progress"></div>
+      </div>
+
+      <div class="controls">
+        <button
+          class="action record-button start-button button"
+          onclick="startRecognition()"
+        >
+          Record
+        </button>
+        <button class="restart-button record button" onclick="playRecording()">
+          Play Recording
+        </button>
+        <button id="next-button" class="exit-button start-button button">
+          Next
+        </button>
+      </div>
+      <div style="display: flex; justify-content: center">
+        <button class="finish-button" onclick="finishGame()">Finish</button>
+      </div>
+
+      <div class="timer">Time Left: <span id="time-left">5</span>s</div>
+      <div>
+        <h3>Your Result:</h3>
+        <h4 id="result" class="hide"></h4>
+      </div>
+    </div>
+    <script>
+      var win = false;
+      let audioPlayed = false;
+      let gameStarted = false;
+      let gameplayed = false;
+      let recognitionStarted = false;
+
+      let recognition;
+
+      let recordedAudioBlob; // This will store the blob from client recording
+      const audioFileName = "output.wav"; // Default filename for recordings
+      // Function to record audio on the server
+      function recordAudioToServer(duration) {
+        return fetch("http://127.0.0.1:5001/record", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            filename: audioFileName,
+            duration: duration, // Duration of the recording in seconds
+          }),
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Network response was not ok");
+            }
+            return response.json();
+          })
+          .then((data) => {
+            console.log(data.message); // Log success message
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+      }
+
+      function playRecording() {
+        const audioUrl = `http://127.0.0.1:5001/audio/${audioFileName}?t=${new Date().getTime()}`; // Append the current timestamp
+        const audioPlayback = new Audio(audioUrl);
+        audioPlayback.play();
+        console.log("Playing recorded audio...");
+      }
+
+      // // const utterance = new SpeechSynthesisUtterance('mango');
+
+      function startRecognition() {
+        const recordDuration = 5; // Set the duration for recording in seconds
+        recordAudioToServer(recordDuration).then(() => {
+          document.getElementById("action").innerHTML = "Record"; // Reset button text after recording
+        });
+        var action = document.querySelector(".action");
+        gameplayed = true;
+        if (gameStarted) return;
+        gameStarted = true;
+        recognitionStarted = true;
+        recognition = new (window.SpeechRecognition ||
+          window.webkitSpeechRecognition)();
+        recognition.lang = "en-US";
+        recognition.interimResults = false;
+        recognition.maxAlternatives = 1;
+        recognition.start();
+
+        recognition.onstart = function () {
+          startTimer();
+          action.textContent = "Recording...";
+          setTimeout(function () {
+            if (recognitionStarted) {
+              recognition.stop(); // Stop recognition after 5 seconds
+              // Check if no speech was detected and update status
+              if (!recognitionStarted) {
+                updateStatus("Time's up! Kindly speak something", "lose");
+              } else {
+                updateStatus("Time's up!", "lose");
+              }
+              setScoreAndColor(0, "red");
+              document.querySelector(".restart-button").style.display = "block";
+              gameStarted = false;
+            }
+          }, 5000);
+        };
+        recognition.onresult = function (event) {
+          recognitionStarted = false;
+          var transcript = event.results[0][0].transcript.toLowerCase();
+          console.log("You said: " + transcript);
+          processResult(transcript);
+        };
+
+        recognition.onerror = function (event) {
+          recognitionStarted = false;
+          updateStatus("Error occurred: " + event.error, "lose");
+          setScoreAndColor(0, "red");
+          document.querySelector(".restart-button").style.display = "block";
+        };
+
+        recognition.onend = function () {
+          if (recognitionStarted) {
+            recognitionStarted = false;
+            updateStatus("Time's up! Kindly speak something", "lose");
+            setScoreAndColor(0, "red");
+          }
+        };
+      }
+      function processResult(transcript) {
+        var progressBar = document.querySelector(".progress");
+        var recordButton = document.querySelector(".record-button");
+        let score;
+        if (transcript.includes("mango")) {
+          win = true;
+          let volume = Math.random() * 100; // Simulate volume detection
+          score = calculateScore(volume);
+          let color = getColorByVolume(volume);
+          if (score >= 80) updateStatus("Score " + score + ": You win!", "win");
+          else updateStatus("Score " + score + ": You lost!", "lose");
+          setScoreAndColor(score, color);
+        } else {
+          updateStatus("Game Over: Score 0", "lose");
+          setScoreAndColor(0, "red");
+        }
+        localStorage.setItem("mango_score", score);
+        console.log(
+          `Saved score for mango: ${localStorage.getItem("mango_score")}`
+        );
+
+        // Show the Play Recording button after the game finishes
+        document.querySelector(".restart-button").style.display = "block";
+        recordButton.textContent = "Record";
+      }
+
+      function calculateScore(volume) {
+        if (volume < 34) return Math.round(volume);
+        if (volume < 68) return Math.round(volume);
+        return Math.round(volume);
+      }
+
+      function getColorByVolume(volume) {
+        if (volume < 34) return "red";
+        if (volume < 68) return "yellow";
+        return "green";
+      }
+
+      function updateStatus(message, statusClass) {
+        var action = document.querySelector(".action");
+        action.textContent = "Record";
+        var result = document.getElementById("result");
+        result.textContent = message;
+        result.className = ""; // Clear all previous classes
+        result.classList.remove("hide");
+        if (statusClass) {
+          // Only add class if it's not empty
+          result.classList.add(statusClass);
+        }
+      }
+
+      function setScoreAndColor(score, color) {
+        var progressBar = document.querySelector(".progress");
+        var recordButton = document.querySelector(".record-button");
+        progressBar.style.width = score + "%";
+        progressBar.style.backgroundColor = color;
+        // localStorage.setItem('mango_level_score', score);
+      }
+
+      function getCurrentPageName() {
+        const path = window.location.pathname;
+        return path.split("/").pop();
+      }
+
+      // Function to get the next page link
+      function getNextPageLink() {
+        const currentPage = getCurrentPageName();
+        const currentIndex = testing_game2_easy_scores.findIndex((item) =>
+          item.link.includes(currentPage)
+        );
+        // If currentIndex is not found or is the last item, loop to the first page or stay on the last page (up to your requirement)
+        if (
+          currentIndex === -1 ||
+          currentIndex === testing_game2_easy_scores.length - 1
+        ) {
+          return "game2_testing_easy_level.html"; // Redirect to 'level2.html' if last item or not found
+        } else {
+          return testing_game2_easy_scores[currentIndex + 1].link; // Get the next page link
+        }
+      }
+
+      // Modify the "Next" button's onclick event
+      document.getElementById("next-button").onclick = function () {
+        if (!gameplayed && !win) {
+          localStorage.setItem("mango_score", 0);
+        }
+        nextButtonClicked = true;
+        const nextPageLink = getNextPageLink();
+        window.location.href = nextPageLink;
+      };
+
+      function getPreviousPageLink() {
+        const currentPage = getCurrentPageName();
+        const currentIndex = testing_game2_easy_scores.findIndex((item) =>
+          item.link.includes(currentPage)
+        );
+        if (currentIndex === 0) {
+          return testing_game2_easy_scores[testing_game2_easy_scores.length - 1]
+            .link; // Redirect to the last page
+        } else {
+          return testing_game2_easy_scores[currentIndex - 1].link; // Get the previous page link
+        }
+      }
+      function startTimer() {
+        let timeLeft = 5;
+        let timerElement = document.getElementById("time-left");
+        timerElement.textContent = timeLeft; // Initialize the countdown
+        let timerId = setInterval(() => {
+          timeLeft -= 1;
+          timerElement.textContent = timeLeft;
+          if (timeLeft <= 0) {
+            clearInterval(timerId);
+            endGame(); // Call endGame if timer runs out
+          }
+        }, 1000);
+      }
+      function endGame() {
+        if (!win) {
+          updateStatus("Time's up!", "lose");
+          setScoreAndColor(0, "red"); // Set the score to 0
+          document.querySelector(".restart-button").style.display = "block"; // Show the Play Recording button
+          gameStarted = false; // Reset game state
+        }
+      }
+
+      function finishGame() {
+        // Redirect to the desired page or functionality for finishing the game
+        window.location.href = "game2_testing_easy_level"; // Change as needed
+      }
+
+      document.getElementById("previous-button").onclick = function () {
+        if (!gameplayed && !win) {
+          localStorage.setItem("mango_score", 0);
+        }
+        previousButtonClicked = true;
+        const previousPageLink = getPreviousPageLink();
+        window.location.href = previousPageLink;
+      };
+    </script>
+  </body>
+</html>

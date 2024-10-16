@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Animal Game</title>
+    <style>
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        font-family: Arial, Helvetica, sans-serif;
+      }
+
+      .container {
+        width: 300px;
+        margin: 0 auto;
+        text-align: center;
+      }
+
+      .grid-container {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: repeat(3, 1fr);
+        gap: 5px;
+      }
+
+      .grid-item {
+        background-color: #83a1da;
+        border: 1px solid #999999;
+        padding: 20px;
+        text-align: center;
+        font-size: 20px;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .grid-item:hover {
+        background-color: #ffffff;
+        border-color: #83a1da;
+      }
+
+      #score {
+        font-weight: 600;
+        font-size: 18px;
+        color: black;
+        margin-top: 20px;
+      }
+
+      .grid-img {
+        height: 55px;
+      }
+
+      .grid-link {
+        color: white;
+        font-weight: 500;
+        text-decoration: none;
+      }
+
+      .grid-link:hover {
+        color: #83a1da;
+      }
+
+      button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div>
+        <h3>Click on the First Animal (Cat Card) to start your game.</h3>
+      </div>
+      <div class="grid-container" id="gridContainer">
+        <!-- Grid items will be dynamically generated here -->
+      </div>
+      <div id="score"></div>
+      <button onclick="submitScores()">Exit</button>
+    </div>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const scores = [
+          {
+            id: 1,
+            name: "Duck",
+            img: "/static/images/duck.png",
+            link: "./duck.html",
+          },
+          {
+            id: 2,
+            name: "Dog",
+            img: "/static/images/dog.gif",
+            link: "./dog.html",
+          },
+          {
+            id: 3,
+            name: "Cow",
+            img: "/static/images/cow.gif",
+            link: "./cow.html",
+          },
+        ];
+
+        function generateGridItems(scores) {
+          const gridContainer = document.getElementById("gridContainer");
+          scores.forEach(function (score) {
+            const gridItem = document.createElement("div");
+            gridItem.classList.add("grid-item");
+            const gridLink = document.createElement("a");
+            gridLink.href = score.link;
+            gridLink.classList.add("grid-link");
+            const gridImg = document.createElement("img");
+            gridImg.src = score.img;
+            gridImg.alt = score.name;
+            gridImg.classList.add("grid-img");
+            gridLink.appendChild(gridImg);
+            gridLink.append(document.createTextNode(score.name));
+            gridItem.appendChild(gridLink);
+            gridContainer.appendChild(gridItem);
+          });
+        }
+
+        function submitScores() {
+          fetch("/submit_score", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ scores: scores }),
+          })
+            .then((response) => response.json())
+            .then((data) => {
+              document.getElementById("score").textContent =
+                "Total Score: " + data.total_score;
+            })
+            .catch((error) => console.error("Error:", error));
+        }
+
+        generateGridItems(scores);
+      });
+    </script>
+  </body>
+</html>

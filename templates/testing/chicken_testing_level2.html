@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="{{ url_for('static', filename='js/scoresArray.js') }}"></script>
+    <title>testing_scores2 Page</title>
+    <style>
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        flex-direction: column;
+        font-family: Arial, sans-serif;
+      }
+
+      .container {
+        width: 300px;
+        margin: 0 auto;
+        text-align: center;
+      }
+      .container h1 {
+        font-size: 1.9rem;
+        font-weight: bold;
+        margin: 0;
+        color: #333;
+        flex-grow: 1;
+        text-align: center;
+
+        margin-bottom: 20px;
+      }
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        margin-bottom: 20px;
+        margin-left: 10px;
+      }
+
+      .logo {
+        margin-right: 20px;
+      }
+
+      .logo img {
+        width: 40px;
+        height: 55px;
+      }
+
+      .logo-text {
+        font-size: 15px;
+        color: #333;
+        margin-right: 15px;
+        margin-bottom: 20px;
+      }
+
+      .header p {
+        font-size: 15px;
+        margin: 0;
+        margin-right: 80px;
+        display: inline;
+        white-space: nowrap; /* Prevent text from wrapping to the next line */
+      }
+
+      h1 {
+        font-size: 20px;
+      }
+
+      .card {
+        background-color: #ffffff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        padding: 20px;
+        margin: 20px auto;
+      }
+      .card img {
+        height: 100px; /* Set the fixed height */
+        width: auto; /* Allow the width to adjust proportionally */
+        border-radius: 8px;
+        margin: 10px 0;
+      }
+
+      .card h2 {
+        font-size: 24px;
+        color: #333;
+        margin: 10px 0;
+      }
+
+      .play-button,
+      .restart-button,
+      .finish-button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 16px;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+      }
+
+      .start-button {
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 16px;
+        background-color: #4caf50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        margin-left: 2px;
+      }
+
+      .play-button {
+        background-color: #4c98af;
+      }
+
+      .record-button {
+        background-color: #4caf50;
+      }
+
+      .restart-button {
+        background-color: #ff9800;
+        display: none;
+      }
+
+      .exit-button {
+        background-color: #4caf50;
+      }
+
+      .finish-button {
+        background-color: #f44336;
+        /* Red color for Finish button */
+        display: block;
+        /* Ensures the button behaves like a block element */
+        width: 30%;
+        /* Full width for better usability */
+      }
+
+      .progress-bar {
+        width: 100%;
+        background-color: #f0f0f0;
+        border-radius: 10px;
+        margin-top: 20px;
+      }
+
+      .progress {
+        width: 0%;
+        height: 20px;
+        background-color: #4caf50;
+        border-radius: 10px;
+        transition: width 0.5s;
+      }
+
+      .controls {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 20px;
+        gap: 2px;
+        flex-wrap: nowrap;
+      }
+
+      .controls button {
+        flex: 1;
+        min-width: 60px;
+        max-width: 80px;
+        height: 30px;
+        padding: 3px;
+        font-size: 12px;
+      }
+
+      @media (max-width: 480px) {
+        .controls {
+          justify-content: center;
+          gap: 1px;
+        }
+
+        .controls button {
+          flex-basis: auto;
+          min-width: 50px;
+          max-width: 70px;
+          height: 28px;
+        }
+      }
+
+      .record {
+        height: 32px !important;
+        transform: translateY(-2px);
+      }
+
+      .hide {
+        visibility: hidden;
+      }
+
+      .win {
+        color: green;
+      }
+
+      .lose {
+        color: red;
+      }
+    </style>
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>Testing Level 2</h1>
+        <div class="header">
+            <div class="logo">
+                <img src="/static/images/logo 3.jpg" alt="Logo" />
+            </div>
+            
+            <p>Record your answer in 1 word.</p>
+        </div>
+        <h2>What is the name of this animal?</h2>
+        
+        <div class="card">
+
+            <img src="../../static/images/chicken-ezgif.com-crop.gif" alt="Chicken Image" />
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress"></div>
+        </div>
+
+
+        <div class="controls">
+            <button class="action record-button start-button" onclick="startRecognition()">Record</button>
+            <button class="restart-button record" onclick="playRecording()">Play
+                Recording</button>
+            <button id='next-button' class="exit-button start-button">Next</button>
+        </div>
+
+        <!-- New Finish Button -->
+        <!-- New Finish Button -->
+        <div style="display: flex; justify-content: center;">
+
+            <button class="finish-button" onclick="finishGame()">Finish</button>
+        </div>
+
+        <div>
+            <h3>Your Result:</h3>
+            <h4 id="result" class="hide"></h4>
+        </div>
+    </div>
+
+    <script>
+      let win = false;
+      let recordedAudioBlob; // This will store the blob from client recording
+      const audioFileName = "output.wav"; // Default filename for recordings
+      let nextButtonClicked = false;
+      let previousButtonClicked = false;
+      let gameplayed = false;
+
+      let mediaRecorder;
+      let audioChunks = [];
+      let isRecording = false;
+
+      function startRecording() {
+        console.log("Attempting to start recording...");
+        if (isRecording) {
+          console.log("Recording is already in progress.");
+          return;
+        }
+
+        navigator.mediaDevices
+          .getUserMedia({ audio: true })
+          .then((stream) => {
+            console.log("Microphone access granted, starting MediaRecorder...");
+            mediaRecorder = new MediaRecorder(stream);
+            mediaRecorder.start();
+            isRecording = true;
+
+            audioChunks = [];
+            mediaRecorder.ondataavailable = (event) => {
+              console.log("Audio data chunk received.");
+              audioChunks.push(event.data);
+            };
+
+            mediaRecorder.onstop = () => {
+              console.log("MediaRecorder stopped.");
+              recordedAudioBlob = new Blob(audioChunks, { type: "audio/wav" });
+              console.log("Recording stopped and audio blob saved.");
+
+              // Upload the audio to the server after recording stops
+              uploadAudioToServer(recordedAudioBlob);
+            };
+          })
+          .catch((err) => {
+            console.error("Error accessing microphone: ", err);
+          });
+      }
+
+      function stopRecording() {
+        console.log("Attempting to stop recording...");
+        if (!isRecording) {
+          console.log("No recording is currently in progress.");
+          return;
+        }
+
+        mediaRecorder.stop();
+        isRecording = false;
+        console.log("Recording stopped successfully.");
+      }
+
+      function playRecording() {
+        console.log("Attempting to play the recorded audio...");
+        if (!recordedAudioBlob) {
+          console.error("No audio recorded to play.");
+          return;
+        }
+
+        const audioUrl = URL.createObjectURL(recordedAudioBlob);
+        const audioPlayback = new Audio(audioUrl);
+        audioPlayback.play();
+        console.log("Playing recorded audio...");
+      }
+
+      function uploadAudioToServer(blob) {
+        console.log("Uploading audio to server...");
+
+        const formData = new FormData();
+        formData.append("audio_data", blob, audioFileName);
+
+        fetch("http://127.0.0.1:5005/save_audio", {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error("Network response was not ok");
+            }
+            return response.json();
+          })
+          .then((data) => {
+            console.log("Audio uploaded successfully:", data.message);
+          })
+          .catch((error) => {
+            console.error("Error uploading audio:", error);
+          });
+      }
+
+      function startRecognition() {
+        console.log("Starting speech recognition...");
+        const recordDuration = 5; // Set the duration for recording in seconds
+
+        startRecording(); // Start the recording
+        setTimeout(() => {
+          console.log("Stopping recording after set duration...");
+          stopRecording(); // Stop recording after the duration
+        }, recordDuration * 1000);
+
+        gameplayed = true;
+        var recordButton = document.querySelector(".record-button");
+        var result = document.getElementById("result");
+        let recognition = new (window.SpeechRecognition ||
+          window.webkitSpeechRecognition)();
+        recognition.lang = "en-US";
+        recognition.interimResults = false;
+
+        recognition.onstart = function () {
+          console.log("Speech recognition started.");
+          recordButton.textContent = "Recording...";
+        };
+
+        recognition.onresult = function (event) {
+          console.log("Speech recognition result received.");
+          var transcript = event.results[0][0].transcript.toLowerCase();
+          console.log("You said: " + transcript);
+
+          let progressBar = document.querySelector(".progress");
+
+          if (transcript.includes("chicken")) {
+            console.log("Correct word ('chicken') detected.");
+            win = true;
+            score = 100; // Set your score
+            result.innerHTML = "Score 100: You win!";
+            result.classList.remove("hide");
+            result.classList.remove("lose");
+            result.classList.add("win");
+
+            // Turn the progress bar green
+            progressBar.style.width = "100%";
+            progressBar.style.backgroundColor = "green";
+          } else {
+            console.log("Incorrect word detected.");
+            score = 0; // Set your score
+            result.innerHTML = "Game Over: Score 0";
+            result.classList.remove("hide");
+            result.classList.remove("win");
+            result.classList.add("lose");
+
+            // Turn the progress bar red
+            progressBar.style.width = "100%";
+            progressBar.style.backgroundColor = "red";
+          }
+
+          // Store the score in localStorage
+          console.log("Storing score in localStorage: ", score);
+          localStorage.setItem("chicken_level2_score", score);
+
+          // Show the Play Recording button after the game finishes
+          document.querySelector(".restart-button").style.display = "block";
+          recordButton.textContent = "Record";
+        };
+
+        recognition.onerror = function (event) {
+          console.error("Speech recognition error occurred: ", event.error);
+          recordButton.textContent = "Record";
+          result.innerHTML = "Error occurred: " + event.error;
+          result.classList.remove("hide");
+          result.classList.remove("win");
+          result.classList.add("lose");
+
+          // Turn the progress bar red in case of an error
+          let progressBar = document.querySelector(".progress");
+          progressBar.style.width = "100%";
+          progressBar.style.backgroundColor = "red";
+
+          // Show the Play Recording button if an error occurs
+          document.querySelector(".restart-button").style.display = "block";
+        };
+
+        recognition.onend = function () {
+          console.log("Speech recognition ended.");
+          recordButton.textContent = "Record";
+        };
+
+        recognition.start();
+        console.log("Recognition started...");
+      }
+
+      function finishGame() {
+        // Redirect to the desired page or functionality for finishing the game
+         window.location.href = "finish_animal_testing_level2"; // Change as needed
+      }
+
+     function getNextPageLink() {
+            const currentPage = getCurrentPageName();
+            const currentIndex = testing_scores2.findIndex(item => item.link.includes(currentPage));
+            // If currentIndex is not found or is the last item, loop to the first page or stay on the last page (up to your requirement)
+            if (currentIndex === -1 || currentIndex === testing_scores2.length - 1) {
+                return "testing_game3_level2"; // Redirect to 'level1.html' if last item or not found
+            } else {
+                return testing_scores2[currentIndex + 1].link; // Get the next page link
+            }
+        }
+      function getCurrentPageName() {
+        const path = window.location.pathname;
+        const currentPage = path.split("/").pop();
+        console.log("Current page name: ", currentPage);
+        return currentPage;
+      }
+
+      // Function to get the next page link
+
+      // Modify the "Next" button's onclick event
+      document.getElementById("next-button").onclick = function () {
+        console.log("Next button clicked.");
+        if (!gameplayed && !win) {
+          console.log("Game not played or won, setting score to 0.");
+          localStorage.setItem("chicken_level2_score", 0);
+        }
+        nextButtonClicked = true;
+        const nextPageLink = getNextPageLink();
+        console.log("Redirecting to next page: ", nextPageLink);
+        window.location.href = nextPageLink;
+      };
+
+      function getPreviousPageLink() {
+        console.log("Attempting to get the previous page link...");
+        const currentPage = getCurrentPageName();
+        const currentIndex = scores7.findIndex((item) =>
+          item.link.includes(currentPage)
+        );
+
+        if (currentIndex === 0) {
+          console.log(
+            "Current page is the first one, redirecting to the last page."
+          );
+          return scores7[scores7.length - 1].link;
+        } else {
+          console.log("Previous page found: ", scores7[currentIndex - 1].link);
+          return scores7[currentIndex - 1].link;
+        }
+      }
+
+      document.getElementById("previous-button").onclick = function () {
+        console.log("Previous button clicked.");
+        if (!gameplayed && !win) {
+          console.log("Game not played or won, setting score to 0.");
+          localStorage.setItem("chicken_level2_score", 0);
+        }
+        previousButtonClicked = true;
+        const previousPageLink = getPreviousPageLink();
+        console.log("Redirecting to previous page: ", previousPageLink);
+        window.location.href = previousPageLink;
+      };
+    </script>
+</body>
+
+</html>

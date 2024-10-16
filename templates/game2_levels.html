@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Level Selection</title>
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif; /* Same font family */
+      }
+
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background-color: #f0f0f0;
+        padding: 20px;
+      }
+
+      .container {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        justify-content: center;
+        align-items: center;
+        max-width: 600px;
+        min-height: 300px;
+      }
+
+      .header {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px; /* Adjust the gap between logo and IzzyAI */
+        margin-bottom: 20px;
+      }
+
+      .header img {
+        width: 50px;
+        height: 50px; /* Adjust the logo size */
+      }
+
+      .header p {
+        font-size: 28px; /* Updated font size for consistency */
+        font-weight: bold;
+        color: #333;
+        margin: 0;
+      }
+
+      h1 {
+        font-size: 32px;
+        color: #333;
+        margin-bottom: 20px; /* Adjust the margin if needed */
+      }
+
+      .card {
+        display: flex;
+        justify-content: center;
+        text-align: center;
+        align-items: center;
+        background-color: #ffffff;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        padding: 20px 40px;
+        transition: transform 0.3s, box-shadow 0.3s;
+        cursor: pointer;
+        flex: none;
+        width: 200px;
+        margin: 0;
+      }
+
+      .card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      }
+
+      .card h2 {
+        font-size: 24px; /* Updated font size for consistency */
+        color: #333;
+        margin-bottom: 10px;
+      }
+
+      .exit-button {
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        padding: 12px 25px;
+        text-align: center;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.3s;
+        flex: 1;
+        min-width: 150px;
+        max-width: 200px;
+        margin-top: 20px;
+        font-size: 18px;
+      }
+
+      .exit-button:hover {
+        background-color: #0056b3;
+        transform: translateY(-5px);
+      }
+
+      @media (max-width: 500px) {
+        .header {
+          align-items: center;
+        }
+
+        .header img {
+          width: 50px;
+          height: 50px;
+        }
+
+        .header p {
+          font-size: 24px; /* Adjusted for consistency */
+        }
+
+        h1 {
+          text-align: center;
+          font-size: 32px;
+        }
+
+        .card {
+          padding: 15px 30px;
+          height: 72px;
+          width: 100%;
+          max-width: 200px;
+        }
+
+        .card h2 {
+          font-size: 20px; /* Adjusted for consistency */
+        }
+
+        .exit-button {
+          padding: 10px 20px;
+          font-size: 16px;
+          height: 56px;
+          margin-bottom: 7px;
+          padding-bottom: 11px;
+          position: relative;
+          transform: translateY(-8px);
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="header">
+        <img src="/static/images/logo 2.jpg" alt="Logo" />
+        <p>IzzyAI</p>
+        <!-- Replace with the path to your logo image -->
+      </div>
+      <h1>Voice Game</h1>
+      <div class="card" onclick="location.href='/game2_easy_level'">
+        <h2>Easy Level</h2>
+      </div>
+      <div class="card" onclick="location.href='/game2_medium_level'">
+        <h2>Medium Level</h2>
+      </div>
+      <div class="card" onclick="location.href='/game2_difficult_level'">
+        <h2>Difficult Level</h2>
+      </div>
+      <div class="card" onclick="location.href='/testing_game2_levels'">
+        <h2>Testing</h2>
+      </div>
+    </div>
+  </body>
+</html>
