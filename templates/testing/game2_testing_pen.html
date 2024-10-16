@@ -257,10 +257,13 @@
       let recognitionStarted = false;
 
       let recognition;
+      let mediaRecorder;
+      let audioChunks = [];
+      let audioBlob;
       const audioFileName = "output.wav"; // Default filename for recordings
 
       function playRecording() {
-        const audioUrl = `http://127.0.0.1:5001/audio/${audioFileName}?t=${new Date().getTime()}`;
+        const audioUrl = URL.createObjectURL(audioBlob); // Create a URL for the recorded audio
         const audioPlayback = new Audio(audioUrl);
         audioPlayback.play();
         console.log("Playing recorded audio...");
@@ -269,7 +272,7 @@
       // Adjusted record logic
       function startRecognition() {
         const recordDuration = 5; // Set the duration for recording in seconds
-        recordAudioToServer(recordDuration).then(() => {
+        startAudioRecording().then(() => {
           sendTextAndAudioToServer(); // Send data after recording finishes
           document.getElementById("action").innerHTML = "Record"; // Reset button text after recording
         });
@@ -290,12 +293,10 @@
         recognition.onstart = function () {
           // Start the timer when recording starts
           startTimer();
-
           action.textContent = "Recording...";
           setTimeout(function () {
             if (recognitionStarted) {
               recognition.stop(); // Stop recognition after 5 seconds
-              // Handle stop logic
               if (!recognitionStarted) {
                 updateStatus("Time's up! Kindly speak something", "lose");
               } else {
@@ -311,7 +312,7 @@
         recognition.onresult = function (event) {
           recognitionStarted = false;
           const transcript = event.results[0][0].transcript.toLowerCase();
-          console.log("You said: " + transcript);
+          console.log("Transcript: " + transcript); // Log the transcript
           processResult(transcript);
         };
 
@@ -331,30 +332,86 @@
         };
       }
 
-      // Send audio file and text for comparison to the server
-      function sendTextAndAudioToServer() {
-        const textToSend = "pen"; // This could be dynamic if required
-        const audioFilePath = "audio/output.wav"; // Full path to the recorded audio file including the file name
+      function finishGame() {
+        // Redirect to the desired page or functionality for finishing the game
+        window.location.href = "game2_testing_easy_level"; // Change as needed
+      }
 
-        fetch("/match_audio_text", {
+      // Start audio recording
+      function startAudioRecording() {
+        return new Promise((resolve, reject) => {
+          if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices
+              .getUserMedia({ audio: true })
+              .then((stream) => {
+                mediaRecorder = new MediaRecorder(stream);
+                mediaRecorder.start();
+
+                mediaRecorder.ondataavailable = (event) => {
+                  audioChunks.push(event.data);
+                };
+
+                mediaRecorder.onstop = () => {
+                  audioBlob = new Blob(audioChunks, { type: "audio/wav" });
+                  audioChunks = [];
+                  console.log("Audio recording complete");
+                  resolve();
+                };
+
+                setTimeout(() => {
+                  mediaRecorder.stop();
+                }, 5000); // Stop recording after 5 seconds
+              })
+              .catch((error) => {
+                console.error("Error accessing microphone: ", error);
+                reject(error);
+              });
+          } else {
+            reject(new Error("getUserMedia not supported on your browser!"));
+          }
+        });
+      }
+
+      // Function to send the recorded audio to the server to be saved
+      function sendTextAndAudioToServer() {
+        const formData = new FormData();
+        formData.append("audio_data", audioBlob, audioFileName); // Send the audio blob
+
+        // First, send the audio to be saved and transcribed
+        fetch("/save_audio", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded", // Changed to form-urlencoded
-          },
-          body: new URLSearchParams({
-            text: textToSend,
-            audio_path: audioFilePath,
-          }),
+          body: formData,
         })
           .then((response) => response.json())
           .then((data) => {
             console.log("Server response:", data);
 
+            matchTextWithAudio();
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+          });
+      }
+
+      // Function to match text and transcribed audio
+      function matchTextWithAudio() {
+        const filepath = "static/audio/output.wav";
+        const textToSend = "pen"; // Expected txt
+        const formData = new FormData();
+        formData.append("text", textToSend);
+        formData.append("audio_path", filepath); // Send the transcription for comparison
+
+        fetch("/match_audio_text", {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log("Match result:", data);
             if (data.match) {
-              // Simulating intensity for the sake of demonstration; replace this with actual audio intensity from the server response
-              let intensity = Math.random() * 100; // Example intensity value, should come from server
-              console.log("Intensity: " + intensity);
+              let intensity = Math.random() * 100; // Example intensity value
               calculateAndDisplayScore(intensity);
+              updateStatus("Your score: " + Math.floor(intensity), "win");
             } else {
               updateStatus("Text does not match transcription.", "lose");
               setScoreAndColor(0, "red");
@@ -365,37 +422,10 @@
           });
       }
 
-      // Function to record audio on the server
-      function recordAudioToServer(duration) {
-        return fetch("/record", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            filename: audioFileName,
-            duration: duration, // Duration of the recording in seconds
-          }),
-        })
-          .then((response) => {
-            if (!response.ok) {
-              throw new Error("Network response was not ok");
-            }
-            return response.json(); // Assuming the endpoint responds with JSON
-          })
-          .then((data) => {
-            console.log(data.message); // Log success message
-          })
-          .catch((error) => {
-            console.error("Error:", error);
-          });
-      }
-
       // Function to calculate the score based on intensity
       function calculateAndDisplayScore(intensity) {
         let score;
 
-        // Calculate score and set progress bar color based on intensity
         if (intensity >= 0 && intensity <= 34) {
           score = Math.round(intensity); // Score from 0-34
           setScoreAndColor(score, "red"); // Set color to red
@@ -414,7 +444,7 @@
           }
         }
 
-        // Save the score in local storage
+        console.log("Final Score: " + score); // Log the score
         localStorage.setItem("pen_score", score);
       }
 
@@ -431,57 +461,21 @@
           setScoreAndColor(0, "red");
         }
 
-        // Show the Play Recording button after the game finishes
         document.querySelector(".restart-button").style.display = "block";
         recordButton.textContent = "Record";
       }
-
-      function startTimer() {
-        let timeLeft = 5; // You can set this duration based on your need
-        let timerElement = document.getElementById("time-left");
-        timerElement.textContent = timeLeft; // Initialize the countdown
-        let timerId = setInterval(() => {
-          timeLeft -= 1;
-          timerElement.textContent = timeLeft;
-          if (timeLeft <= 0) {
-            clearInterval(timerId);
-            endGame(); // Call endGame if timer runs pen
-          }
-        }, 1000);
-      }
-
-      function endGame() {
-        if (!win) {
-          updateStatus("Time's up!", "lose");
-          setScoreAndColor(0, "red"); // Set the score to 0
-          document.querySelector(".restart-button").style.display = "block"; // Show the Play Recording button
-          gameStarted = false; // Reset game state
+      function getPreviousPageLink() {
+        const currentPage = getCurrentPageName();
+        const currentIndex = game2_easy_scores.findIndex((item) =>
+          item.link.includes(currentPage)
+        );
+        if (currentIndex === 0) {
+          return game2_easy_scores[game2_easy_scores.length - 1].link; // Redirect to the last page
+        } else {
+          return game2_easy_scores[currentIndex - 1].link; // Get the previous page link
         }
       }
 
-      function finishGame() {
-        // Redirect to the desired page or functionality for finishing the game
-        window.location.href = "game2_testing_easy_level"; // Change as needed
-      }
-
-      function setScoreAndColor(score, color) {
-        var progressBar = document.querySelector(".progress");
-        progressBar.style.width = score + "%";
-        progressBar.style.backgroundColor = color;
-      }
-
-      function updateStatus(message, statusClass) {
-        var action = document.querySelector(".action");
-        action.textContent = "Record";
-        var result = document.getElementById("result");
-        result.textContent = message;
-        result.className = ""; // Clear all previous classes
-        result.classList.remove("hide");
-        if (statusClass) {
-          // Only add class if it's not empty
-          result.classList.add(statusClass);
-        }
-      }
       function getCurrentPageName() {
         const path = window.location.pathname;
         return path.split("/").pop();
@@ -498,22 +492,19 @@
           currentIndex === -1 ||
           currentIndex === testing_game2_easy_scores.length - 1
         ) {
-          return "game2_testing_easy_level.html"; // Redirect to 'level2.html' if last item or not found
         } else {
           return testing_game2_easy_scores[currentIndex + 1].link; // Get the next page link
         }
       }
-
-      // Modify the "Next" button's onclick event
       document.getElementById("next-button").onclick = function () {
-        if (!gameplayed && !win) {
+        let score = localStorage.getItem("pen_score");
+        if (!gameplayed && (score === null || score === undefined)) {
           localStorage.setItem("pen_score", 0);
         }
         nextButtonClicked = true;
         const nextPageLink = getNextPageLink();
         window.location.href = nextPageLink;
       };
-
       function getPreviousPageLink() {
         const currentPage = getCurrentPageName();
         const currentIndex = testing_game2_easy_scores.findIndex((item) =>
@@ -534,6 +525,46 @@
         const previousPageLink = getPreviousPageLink();
         window.location.href = previousPageLink;
       };
+      function startTimer() {
+        let timeLeft = 5;
+        let timerElement = document.getElementById("time-left");
+        timerElement.textContent = timeLeft;
+        let timerId = setInterval(() => {
+          timeLeft -= 1;
+          timerElement.textContent = timeLeft;
+          if (timeLeft <= 0) {
+            clearInterval(timerId);
+            endGame(); // Call endGame if timer runs in
+          }
+        }, 1000);
+      }
+
+      function endGame() {
+        if (!win) {
+          updateStatus("Time's up!", "lose");
+          setScoreAndColor(0, "red");
+          document.querySelector(".restart-button").style.display = "block";
+          gameStarted = false;
+        }
+      }
+
+      function setScoreAndColor(score, color) {
+        var progressBar = document.querySelector(".progress");
+        progressBar.style.width = score + "%";
+        progressBar.style.backgroundColor = color;
+      }
+
+      function updateStatus(message, statusClass) {
+        var action = document.querySelector(".action");
+        action.textContent = "Record";
+        var result = document.getElementById("result");
+        result.textContent = message;
+        result.className = "";
+        result.classList.remove("hide");
+        if (statusClass) {
+          result.classList.add(statusClass);
+        }
+      }
     </script>
   </body>
 </html>

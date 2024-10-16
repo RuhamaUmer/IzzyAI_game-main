@@ -257,20 +257,55 @@
       let recognitionStarted = false;
 
       let recognition;
-
-      let recordedAudioBlob; // This will store the blob from client recording
-      const audioFileName = "output.wav"; // Default filename for recordings
+      let mediaRecorder; // To manage the media recording process
+      let recordedChunks = []; // Array to hold the audio chunks
+      let recordedAudioBlob; // Store the final audio b
       // Function to record audio on the server
-      function recordAudioToServer(duration) {
-        return fetch("http://127.0.0.1:5001/record", {
+
+      function startAudioRecording() {
+        navigator.mediaDevices
+          .getUserMedia({ audio: true })
+          .then((stream) => {
+            mediaRecorder = new MediaRecorder(stream);
+            recordedChunks = [];
+
+            mediaRecorder.ondataavailable = (event) => {
+              if (event.data.size > 0) {
+                recordedChunks.push(event.data);
+              }
+            };
+
+            mediaRecorder.onstop = () => {
+              recordedAudioBlob = new Blob(recordedChunks, {
+                type: "audio/wav",
+              });
+              console.log("Audio recording finished.");
+              // Optionally save the audio to a server
+              saveAudioToServer(recordedAudioBlob);
+            };
+
+            mediaRecorder.start();
+            console.log("Recording audio...");
+          })
+          .catch((error) => {
+            console.error("Error accessing microphone:", error);
+          });
+      }
+
+      // Function to stop the recording
+      function stopAudioRecording() {
+        if (mediaRecorder && mediaRecorder.state !== "inactive") {
+          mediaRecorder.stop();
+        }
+      }
+
+      function saveAudioToServer(audioBlob) {
+        const formData = new FormData();
+        formData.append("audio", audioBlob, "recorded_audio.wav");
+
+        fetch("http://127.0.0.1:5001/save_audio", {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            filename: audioFileName,
-            duration: duration, // Duration of the recording in seconds
-          }),
+          body: formData,
         })
           .then((response) => {
             if (!response.ok) {
@@ -282,24 +317,28 @@
             console.log(data.message); // Log success message
           })
           .catch((error) => {
-            console.error("Error:", error);
+            console.error("Error saving audio:", error);
           });
       }
 
       function playRecording() {
-        const audioUrl = `http://127.0.0.1:5001/audio/${audioFileName}?t=${new Date().getTime()}`; // Append the current timestamp
-        const audioPlayback = new Audio(audioUrl);
-        audioPlayback.play();
-        console.log("Playing recorded audio...");
+        if (recordedAudioBlob) {
+          const audioUrl = URL.createObjectURL(recordedAudioBlob);
+          const audioPlayback = new Audio(audioUrl);
+          audioPlayback.play();
+          console.log("Playing recorded audio...");
+        } else {
+          console.log("No audio recording available.");
+        }
       }
 
       // // const utterance = new SpeechSynthesisUtterance('net');
 
       function startRecognition() {
-        const recordDuration = 5; // Set the duration for recording in seconds
-        recordAudioToServer(recordDuration).then(() => {
-          document.getElementById("action").innerHTML = "Record"; // Reset button text after recording
-        });
+        startAudioRecording(); // Start recording audio
+        const recordDuration = 5000; // 5 seconds in milliseconds
+        setTimeout(stopAudioRecording, recordDuration); // Stop recording after 5 seconds
+
         var action = document.querySelector(".action");
         gameplayed = true;
         if (gameStarted) return;
@@ -330,6 +369,7 @@
             }
           }, 5000);
         };
+
         recognition.onresult = function (event) {
           recognitionStarted = false;
           var transcript = event.results[0][0].transcript.toLowerCase();
@@ -352,6 +392,7 @@
           }
         };
       }
+
       function processResult(transcript) {
         var progressBar = document.querySelector(".progress");
         var recordButton = document.querySelector(".record-button");
@@ -408,7 +449,7 @@
         var recordButton = document.querySelector(".record-button");
         progressBar.style.width = score + "%";
         progressBar.style.backgroundColor = color;
-        // localStorage.setItem('net_level_score', score);
+        // localStorage.setItem('ball_level_score', score);
       }
 
       function getCurrentPageName() {
@@ -427,7 +468,6 @@
           currentIndex === -1 ||
           currentIndex === testing_game2_easy_scores.length - 1
         ) {
-          return "game2_testing_easy_level.html"; // Redirect to 'level2.html' if last item or not found
         } else {
           return testing_game2_easy_scores[currentIndex + 1].link; // Get the next page link
         }

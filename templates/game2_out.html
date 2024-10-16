@@ -346,6 +346,10 @@
         };
       }
 
+      function finishGame() {
+        // Redirect to the desired page or functionality for finishing the game
+        window.location.href = "game2_easy_level"; // Change as needed
+      }
       // Start audio recording
       function startAudioRecording() {
         return new Promise((resolve, reject) => {
@@ -420,10 +424,7 @@
             if (data.match) {
               let intensity = Math.random() * 100; // Example intensity value
               calculateAndDisplayScore(intensity);
-              updateStatus(
-                "Text matches transcription! Score: " + intensity,
-                "win"
-              );
+              updateStatus("Your score: " + Math.floor(intensity), "win");
             } else {
               updateStatus("Text does not match transcription.", "lose");
               setScoreAndColor(0, "red");
@@ -476,7 +477,67 @@
         document.querySelector(".restart-button").style.display = "block";
         recordButton.textContent = "Record";
       }
+      function getPreviousPageLink() {
+        const currentPage = getCurrentPageName();
+        const currentIndex = game2_easy_scores.findIndex((item) =>
+          item.link.includes(currentPage)
+        );
+        if (currentIndex === 0) {
+          return game2_easy_scores[game2_easy_scores.length - 1].link; // Redirect to the last page
+        } else {
+          return game2_easy_scores[currentIndex - 1].link; // Get the previous page link
+        }
+      }
 
+      function getCurrentPageName() {
+        const path = window.location.pathname;
+        return path.split("/").pop();
+      }
+
+      // Function to get the next page link
+      function getNextPageLink() {
+        const currentPage = getCurrentPageName();
+        const currentIndex = game2_easy_scores.findIndex((item) =>
+          item.link.includes(currentPage)
+        );
+        // If currentIndex is not found or is the last item, loop to the first page or stay on the last page (up to your requirement)
+        if (
+          currentIndex === -1 ||
+          currentIndex === game2_easy_scores.length - 1
+        ) {
+          return "game2_easy_level.html"; // Redirect to 'level2.html' if last item or not found
+        } else {
+          return game2_easy_scores[currentIndex + 1].link; // Get the next page link
+        }
+      }
+      document.getElementById("next-button").onclick = function () {
+        let score = localStorage.getItem("out_score");
+        if (!gameplayed && (score === null || score === undefined)) {
+          localStorage.setItem("out_score", 0);
+        }
+        nextButtonClicked = true;
+        const nextPageLink = getNextPageLink();
+        window.location.href = nextPageLink;
+      };
+      function getPreviousPageLink() {
+        const currentPage = getCurrentPageName();
+        const currentIndex = game2_easy_scores.findIndex((item) =>
+          item.link.includes(currentPage)
+        );
+        if (currentIndex === 0) {
+          return game2_easy_scores[game2_easy_scores.length - 1].link; // Redirect to the last page
+        } else {
+          return game2_easy_scores[currentIndex - 1].link; // Get the previous page link
+        }
+      }
+      document.getElementById("previous-button").onclick = function () {
+        if (!gameplayed && !win) {
+          localStorage.setItem("boat_score", 0);
+        }
+        previousButtonClicked = true;
+        const previousPageLink = getPreviousPageLink();
+        window.location.href = previousPageLink;
+      };
       function startTimer() {
         let timeLeft = 5;
         let timerElement = document.getElementById("time-left");
