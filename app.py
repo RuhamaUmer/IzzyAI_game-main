@@ -9,6 +9,7 @@ import speech_recognition as sr
 from flask_cors import CORS
 import speech_recognition as sr
 from pydub import AudioSegment
+from datetime import timedelta
 
 
 app = Flask(__name__)
@@ -122,11 +123,13 @@ def save_audio():
         # Save the audio file
         audio_file.save(save_path)
         print(f"Audio saved successfully at {save_path}")
-        return jsonify(message="Audio saved"), 200
+        # Generate the correct URL for the saved file using url_for
+        audio_url = url_for('static', filename=f'audio/{filename}', _external=True)
+
+        return jsonify(message="Audio saved", audio_url=audio_url), 200
     except Exception as e:
         print(f"An error occurred while saving the audio: {e}")
         return jsonify(message=f"Failed to save audio: {str(e)}"), 500
-
 def transcribe_audio(audio_file_path):
     recognizer = sr.Recognizer()
     try:
@@ -211,8 +214,7 @@ def match_audio_text():
     if not audio_file_path:
         return jsonify({"error": "No audio file path provided"}), 400
 
-    if not os.path.exists(audio_file_path):
-        return jsonify({"error": "Audio file path does not exist"}), 400
+   
 
     converted_path = convert_to_wav(audio_file_path)
 
