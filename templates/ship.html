@@ -342,7 +342,7 @@
         const formData = new FormData();
         formData.append("audio_data", blob, audioFileName);
 
-        fetch("http://127.0.0.1:5001/save_audio", {
+        fetch("/save_audio", {
           method: "POST",
           body: formData,
         })

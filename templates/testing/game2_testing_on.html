@@ -298,7 +298,6 @@
             if (recognitionStarted) {
               recognition.stop(); // Stop recognition after 5 seconds
               if (!recognitionStarted) {
-                updateStatus("Time's up! Kindly speak something", "lose");
               } else {
                 updateStatus("Time's up!", "lose");
               }
@@ -541,8 +540,8 @@
 
       function endGame() {
         if (!win) {
-          updateStatus("Time's up!", "lose");
-          setScoreAndColor(0, "red");
+          updateStatus("Time's up! Your score is 0", "lose"); // Display the message with the score
+          setScoreAndColor(0, "red"); // Fill the progress bar with red when score is 0
           document.querySelector(".restart-button").style.display = "block";
           gameStarted = false;
         }

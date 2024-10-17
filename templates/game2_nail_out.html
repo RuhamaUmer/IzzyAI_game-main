@@ -331,7 +331,7 @@
         const formData = new FormData();
         formData.append("audio_data", blob, audioFileName);
 
-        fetch("http://127.0.0.1:5001/save_audio", {
+        fetch("/save_audio", {
           method: "POST",
           body: formData,
         })
@@ -390,7 +390,6 @@
               recognition.stop(); // Stop recognition after 5 seconds
               // Check if no speech was detected and update status
               if (!recognitionStarted) {
-                updateStatus("Time's up! Kindly speak something", "lose");
               } else {
                 updateStatus("Time's up!", "lose");
               }
