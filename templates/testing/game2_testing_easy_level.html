@@ -237,17 +237,28 @@
 
       let sessionData = {};
 
-      async function fetchSessionData() {
-        try {
-          const response = await fetch("/get_session_data");
-          if (!response.ok) {
-            throw new Error("Failed to fetch session data");
-          }
-          sessionData = await response.json();
-          console.log("Session Data:", sessionData);
-        } catch (error) {
-          console.error("Error:", error);
-        }
+      async function fetchSessionData(retries = 3) {
+        console.log("Fetching session data...");
+        return fetch("/get_session_data")
+          .then((response) => {
+            if (!response.ok) {
+              throw new Error(
+                `Failed to fetch session data, status: ${response.status}`
+              );
+            }
+            return response.json();
+          })
+          .then((data) => {
+            sessionData = data;
+            console.log("Session Data:", sessionData);
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            if (retries > 0) {
+              console.log(`Retrying... (${3 - retries + 1})`);
+              return fetchSessionData(retries - 1);
+            }
+          });
       }
 
       const scores = [

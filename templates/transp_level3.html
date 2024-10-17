@@ -313,11 +313,14 @@
       ];
 
       // Fetch session data
-      function fetchSessionData() {
+      function fetchSessionData(retries = 3) {
+        console.log("Fetching session data...");
         return fetch("/get_session_data")
           .then((response) => {
             if (!response.ok) {
-              throw new Error("Failed to fetch session data");
+              throw new Error(
+                `Failed to fetch session data, status: ${response.status}`
+              );
             }
             return response.json();
           })
@@ -327,6 +330,10 @@
           })
           .catch((error) => {
             console.error("Error:", error);
+            if (retries > 0) {
+              console.log(`Retrying... (${3 - retries + 1})`);
+              return fetchSessionData(retries - 1);
+            }
           });
       }
 

@@ -113,7 +113,7 @@ from flask import url_for
 def save_audio():
     if 'audio_data' not in request.files:
         return jsonify(message="No audio file provided."), 400
-
+    
     audio_file = request.files['audio_data']
     filename = secure_filename(audio_file.filename)
     save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
@@ -122,22 +122,10 @@ def save_audio():
         # Save the audio file
         audio_file.save(save_path)
         print(f"Audio saved successfully at {save_path}")
-
-        # Generate the correct URL for the saved file using url_for
-        audio_url = url_for('static', filename=f'audio/{filename}', _external=True)
-        
-        # Optionally transcribe the audio
-        transcription = transcribe_audio(save_path)
-        if transcription:
-            print(f"Transcription: {transcription}")
-            return jsonify(message="Audio saved and transcribed", transcription=transcription, audio_url=audio_url), 200
-        else:
-            return jsonify(message="Audio saved but could not be transcribed", audio_url=audio_url), 200
-
+        return jsonify(message="Audio saved"), 200
     except Exception as e:
-        print(f"An error occurred while saving or transcribing the audio: {e}")
-        return jsonify(message=f"Failed to save or transcribe audio: {str(e)}"), 500
-
+        print(f"An error occurred while saving the audio: {e}")
+        return jsonify(message=f"Failed to save audio: {str(e)}"), 500
 
 def transcribe_audio(audio_file_path):
     recognizer = sr.Recognizer()
