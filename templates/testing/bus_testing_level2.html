@@ -264,6 +264,7 @@
       let isRecording = false;
 
       function startRecording() {
+        const recordDuration = 5; // Set the duration for recording in seconds
         console.log("Attempting to start recording...");
         if (isRecording) {
           console.log("Recording is already in progress.");
@@ -296,6 +297,9 @@
           .catch((err) => {
             console.error("Error accessing microphone: ", err);
           });
+          setTimeout(() => {
+            mediaRecorder.stop();
+          }, recordDuration * 1000); // Convert duration to milliseconds
       }
 
       function stopRecording() {
@@ -349,14 +353,10 @@
 
       function startRecognition() {
         console.log("Starting speech recognition...");
-        const recordDuration = 5; // Set the duration for recording in seconds
+        
 
         startRecording(); // Start the recording
-        setTimeout(() => {
-          console.log("Stopping recording after set duration...");
-          stopRecording(); // Stop recording after the duration
-        }, recordDuration * 1000);
-
+        
         gameplayed = true;
         var recordButton = document.querySelector(".record-button");
         var result = document.getElementById("result");

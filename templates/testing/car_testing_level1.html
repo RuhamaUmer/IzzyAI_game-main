@@ -309,9 +309,7 @@
 
           // Stop recording after the specified duration
           setTimeout(() => {
-            if (mediaRecorder.state === "recording") {
-              mediaRecorder.stop(); // Stop recording after 5 seconds
-            }
+            mediaRecorder.stop();
           }, recordDuration * 1000); // Convert duration to milliseconds
         });
       }

@@ -15,6 +15,7 @@ from datetime import timedelta
 app = Flask(__name__)
 # Generates a random key
 app.secret_key = os.urandom(24)  
+app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(hours=1)  # Set as needed
 
 # Enable CORS for all routes and origins
 CORS(app)  
@@ -237,6 +238,8 @@ def match_audio_text():
 def get_session_data():
     user_id = session.get('UserID')
     disorder_id = session.get('DisorderID')
+    print(user_id)
+    print('disorder_id', disorder_id)
     if user_id and disorder_id:
         return jsonify({'UserID': user_id, 'DisorderID': disorder_id})
     return jsonify({'error': 'No session data available'}), 404
@@ -272,8 +275,10 @@ def start_sounds_game(user_id, disorder_id):
 
 @app.route('/game2_easy_level', methods=['GET'])
 def game2_easy_level():
+    user_id = session.get('UserID')
+    disorder_id = session.get('DisorderID')
     # Render a game template
-    return render_template('game2_easy_level.html')
+    return render_template('game2_easy_level.html',user_id=user_id, disorder_id=disorder_id)
 
 @app.route('/game2_medium_level', methods=['GET'])
 def game2_medium_level():

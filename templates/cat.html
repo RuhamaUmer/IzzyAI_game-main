@@ -324,9 +324,6 @@
           };
 
           // Stop recording after the specified duration
-          setTimeout(() => {
-            mediaRecorder.stop();
-          }, recordDuration * 1000); // Convert duration to milliseconds
         });
       }
 
@@ -374,6 +371,7 @@
 
         // Start recording the audio
         startRecording();
+        setTimeout(() => stopRecording(), recordDuration * 1000);
 
         updateProgressBar("#f0f0f0", "0%"); // Reset the progress bar
 
@@ -423,6 +421,11 @@
         };
 
         recognition.start();
+      }
+
+      function stopRecording() {
+        mediaRecorder.stop();
+        isRecording = false;
       }
 
       // Get the current page name

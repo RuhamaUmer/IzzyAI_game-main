@@ -239,7 +239,7 @@
 
       let sessionData = {};
 
-      async function fetchSessionData(retries = 3) {
+      function fetchSessionData(retries = 3) {
         console.log("Fetching session data...");
         return fetch("/get_session_data")
           .then((response) => {

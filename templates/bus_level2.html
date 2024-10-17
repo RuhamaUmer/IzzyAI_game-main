@@ -351,10 +351,7 @@
         const recordDuration = 5; // Set the duration for recording in seconds
 
         startRecording(); // Start the recording
-        setTimeout(() => {
-          console.log("Stopping recording after set duration...");
-          stopRecording(); // Stop recording after the duration
-        }, recordDuration * 1000);
+        
 
         gameplayed = true;
         var recordButton = document.querySelector(".record-button");
