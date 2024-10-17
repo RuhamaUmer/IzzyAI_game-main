@@ -400,7 +400,8 @@
 
       // Function to match text and transcribed audio
       function matchTextWithAudio() {
-        const filepath = "static/audio/output.wav";
+        const filepath = "{{ url_for('static', filename='audio/output.wav') }}";
+        console.log(filepath); // This will print the correct path based on the environment
         const textToSend = "in"; // Expected txt
         const formData = new FormData();
         formData.append("text", textToSend);

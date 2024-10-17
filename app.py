@@ -103,15 +103,17 @@ def get_audio(filename):
     response.headers['Expires'] = '0'  # Proxies.
     return response
 
-UPLOAD_FOLDER =r'static\audio'
+UPLOAD_FOLDER = r'static/audio'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
+from flask import url_for
+# Save and transcribe audio file route
 @app.route('/save_audio', methods=['POST'])
 def save_audio():
     if 'audio_data' not in request.files:
         return jsonify(message="No audio file provided."), 400
-    
+
     audio_file = request.files['audio_data']
     filename = secure_filename(audio_file.filename)
     save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
@@ -120,9 +122,17 @@ def save_audio():
         # Save the audio file
         audio_file.save(save_path)
         print(f"Audio saved successfully at {save_path}")
+
+        # Generate the correct URL for the saved file using url_for
+        audio_url = url_for('static', filename=f'audio/{filename}', _external=True)
         
-      
-        return jsonify(message="Audio saved"), 200
+        # Optionally transcribe the audio
+        transcription = transcribe_audio(save_path)
+        if transcription:
+            print(f"Transcription: {transcription}")
+            return jsonify(message="Audio saved and transcribed", transcription=transcription, audio_url=audio_url), 200
+        else:
+            return jsonify(message="Audio saved but could not be transcribed", audio_url=audio_url), 200
 
     except Exception as e:
         print(f"An error occurred while saving or transcribing the audio: {e}")
@@ -135,20 +145,20 @@ def transcribe_audio(audio_file_path):
         # Load and transcribe the audio file
         with sr.AudioFile(audio_file_path) as source:
             audio_data = recognizer.record(source)
-        
+
         # Try to recognize the text from the audio
         text = recognizer.recognize_google(audio_data)
         return text
-    
+
     except sr.UnknownValueError:
         # Handle case where the audio is not clear or transcribable
         print("Google Speech Recognition could not understand the audio.")
         return None
-    
+
     except sr.RequestError as e:
         # Handle errors in the API request to Google Speech Recognition
         print(f"Could not request results from Google Speech Recognition service; {e}")
-        return None            
+        return None
 
 # def convert_to_pcm_wav(input_file, output_file):
 #     try:

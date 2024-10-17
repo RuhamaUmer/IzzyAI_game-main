@@ -532,6 +532,7 @@
         const previousPageLink = getPreviousPageLink();
         window.location.href = previousPageLink;
       };
+
       function startTimer() {
         let timeLeft = 5;
         let timerElement = document.getElementById("time-left");
@@ -550,6 +551,7 @@
         // Redirect to the desired page or functionality for finishing the game
         window.location.href = "game2_easy_level"; // Change as needed
       }
+
       function endGame() {
         if (!win) {
           updateStatus("Time's up!", "lose");

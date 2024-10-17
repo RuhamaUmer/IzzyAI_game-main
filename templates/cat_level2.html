@@ -28,6 +28,7 @@
         color: #333;
         flex-grow: 1;
         text-align: center;
+
         margin-bottom: 20px;
       }
 
@@ -95,8 +96,11 @@
 
       .finish-button {
         background-color: #f44336;
+        /* Red color for Finish button */
         display: block;
+        /* Ensures the button behaves like a block element */
         width: 30%;
+        /* Full width for better usability */
       }
 
       .progress-bar {
@@ -128,6 +132,46 @@
         height: 30px;
         padding: 3px;
         font-size: 12px;
+      }
+      .logo-paragraph-wrapper {
+        display: flex;
+        align-items: center; /* Ensure both logo and paragraph are vertically aligned */
+      }
+
+      .logo-container {
+        display: flex;
+        justify-content: center;
+        align-items: center; /* Center the logo within its container */
+        margin-left: 30px;
+      }
+
+      .logo-img {
+        width: 40px;
+        height: 55px;
+        margin-right: 20px;
+      }
+
+      .paragraph-container {
+        display: inline; /* Change from 'flex' to 'inline' */
+        white-space: nowrap; /* Prevent text from wrapping to the next line */
+      }
+
+      @media (max-width: 480px) {
+        .logo-paragraph-container {
+          justify-content: center; /* Optional: center align for small screens */
+        }
+
+        .controls {
+          justify-content: center;
+          gap: 1px;
+        }
+
+        .controls button {
+          flex-basis: auto;
+          min-width: 50px;
+          max-width: 70px;
+          height: 28px;
+        }
       }
 
       .record {
@@ -224,6 +268,8 @@
       let mediaRecorder;
       let audioChunks = [];
       let isRecording = false;
+      let timerElement; // Timer display element
+      let scoreDisplay = document.getElementById("score-display"); // Score display element
 
       function startRecording() {
         navigator.mediaDevices
@@ -242,6 +288,9 @@
               recordedAudioBlob = new Blob(audioChunks, { type: "audio/wav" });
               uploadAudioToServer(recordedAudioBlob);
             };
+
+            // Start the timer
+            startTimer(5); // Start a 5-second timer
           })
           .catch((err) => {
             console.error("Error accessing microphone: ", err);
@@ -300,6 +349,8 @@
             win = true;
             score = 100;
             result.innerHTML = "Score 100: You win!";
+            scoreDisplay.textContent = score; // Update the displayed score
+            console.log("Score:", score); // Log the score
             result.classList.remove("hide", "lose");
             result.classList.add("win");
             progressBar.style.width = "100%";
@@ -307,10 +358,11 @@
           } else {
             score = 0;
             result.innerHTML = "Game Over: Score 0";
+            scoreDisplay.textContent = score; // Update the displayed score
+            console.log("Score:", score); // Log the score
             result.classList.remove("hide", "win");
             result.classList.add("lose");
-            progressBar.style.width = "100%";
-            progressBar.style.backgroundColor = "red";
+            setScoreAndColor(0, "red"); // Fill the progress bar red
           }
 
           localStorage.setItem("cat_level2_score", score);
@@ -325,8 +377,8 @@
           result.classList.add("lose");
 
           let progressBar = document.querySelector(".progress");
-          progressBar.style.width = "100%";
-          progressBar.style.backgroundColor = "red";
+          progressBar.style.width = "100%"; // Fill the progress bar
+          progressBar.style.backgroundColor = "red"; // Set color to red
 
           document.querySelector(".restart-button").style.display = "block";
         };
@@ -336,6 +388,49 @@
         };
 
         recognition.start();
+      }
+
+      // Timer function
+      function startTimer(duration) {
+        let timeLeft = duration;
+        timerElement = document.getElementById("time-left");
+        timerElement.textContent = timeLeft;
+        let timerId = setInterval(() => {
+          timeLeft -= 1;
+          timerElement.textContent = timeLeft;
+          if (timeLeft <= 0) {
+            clearInterval(timerId);
+            endGame(); // Call endGame if timer runs out
+          }
+        }, 1000);
+      }
+
+      function endGame() {
+        if (!win) {
+          updateStatus("Time's up!", "lose");
+          setScoreAndColor(0, "red"); // Fill the progress bar red
+          console.log("Score: 0"); // Log score when time's up
+          document.querySelector(".restart-button").style.display = "block";
+          isRecording = false; // Ensure recording state is updated
+        }
+      }
+
+      function setScoreAndColor(score, color) {
+        var progressBar = document.querySelector(".progress");
+        progressBar.style.width = score + "%"; // Fill progress bar according to score
+        progressBar.style.backgroundColor = color; // Set background color
+      }
+
+      function updateStatus(message, statusClass) {
+        var action = document.querySelector(".action");
+        action.textContent = "Record";
+        var result = document.getElementById("result");
+        result.textContent = message;
+        result.className = "";
+        result.classList.remove("hide");
+        if (statusClass) {
+          result.classList.add(statusClass);
+        }
       }
 
       function finishGame() {
@@ -353,6 +448,7 @@
           return scores2[currentIndex + 1].link;
         }
       }
+
       function getCurrentPageName() {
         const path = window.location.pathname;
         const currentPage = path.split("/").pop();
